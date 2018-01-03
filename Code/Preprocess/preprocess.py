@@ -41,11 +41,17 @@ for word in words:
                     tempVar = frame.shape[0]
                     frame = frame[int(tempVar/2.0):tempVar,:]
                     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    mouth_rects = mouth_cascade.detectMultiScale(gray, 1.7, 11)
+                    mouth_rects = mouth_cascade.detectMultiScale(gray, 1.7, 5)
                     if len(mouth_rects)!=0:
-                        default_mouth_rects = mouth_rects
+                        finalIndex = 10
+                        for x in range(0,len(mouth_rects)):
+                            if mouth_rects[x][2]==43 and mouth_rects[x][3]==72:
+                                finalIndex = x
+                        if finalIndex!=10:
+                            default_mouth_rects = [mouth_rects[finalIndex]]
+                            break
+                        # default_mouth_rects = mouth_rects
                         # print 'I got mouth rects in frame ',ctr
-                        break
                     if ctr==28 and len(mouth_rects)==0:
                         bakwasFile.write(TARGET_DIRECTORY+word+setType+videoFileName.replace('mp4','avi')+'\n')
                         bakwasFileFlag = True
