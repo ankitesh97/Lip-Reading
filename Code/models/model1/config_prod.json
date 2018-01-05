@@ -1,0 +1,69 @@
+
+
+{
+  "CNN":
+  {
+    "Input_shape":[28,28,1],
+    "Conv-Box-1":
+    {
+        "filters": 32,
+        "kernel_size":[5,5],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-2":
+    {
+        "filters": 32,
+        "kernel_size":[5,5],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-3":
+    {
+        "filters": 32,
+        "kernel_size":[5,5],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-4":
+    {
+        "filters": 32,
+        "kernel_size":[5,5],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-5":
+    {
+        "filters": 32,
+        "kernel_size":[5,5],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Dense":
+    {
+      "activation": "relu",
+      "units_layer_1": 1024,
+      "units_layer_2": 512,
+      "dropout_1_rate": 0.4,
+      "dropout_2_rate": 0.2,
+      "feature_dim": 10
+    }
+
+  },
+
+  "RNN":
+  {
+    "hidden_dim":20,
+
+  }
+}
