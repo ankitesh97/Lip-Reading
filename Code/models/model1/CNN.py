@@ -15,7 +15,6 @@ import numpy as np
 
 def define_scope(function):
     attribute = '_cache_' + function.__name__
-    print attribute
     @property
     @functools.wraps(function)
     def decorator(self):
@@ -28,21 +27,19 @@ def define_scope(function):
 
 
 class CNN:
-    def __init__(self, input_tensor, config=None, is_training):
+    def __init__(self, config, is_training=True):
         self.forward
-        self.backward
-        self.input = input_tensor
         self.config = config
-        wdwqdw
         self.is_training = is_training
 
     @define_scope
     def forward(self):
         # Conv-Box 1
         box1 = self.config['Conv-Box-1']
-
+        inp_shape = self.config['Input_shape']
+        input_tensor = tf.placeholder(tf.float32, shape=[-1]+inp_shape)
         conv1 = tf.layers.conv2d(
-            inputs = self.input,
+            inputs = input_tensor,
             filters = box1['filters'],
             kernel_size = box1['kernel_size'],
             padding = "same",
@@ -51,7 +48,7 @@ class CNN:
         pool1 = tf.layers.max_pooling2d(
             inputs=conv1,
             pool_size = box1['pool_size'],
-            strides= = box1['strides'])
+            strides = box1['strides'])
 
 
         # Conv-Box-2
@@ -66,7 +63,7 @@ class CNN:
         pool2 = tf.layers.max_pooling2d(
             inputs=conv2,
             pool_size = box2['pool_size'],
-            strides= = box2['strides'])
+            strides = box2['strides'])
 
 
         # Conv-Box-3
@@ -91,7 +88,7 @@ class CNN:
         pool4 = tf.layers.max_pooling2d(
             inputs=conv4,
             pool_size = box4['pool_size'],
-            strides= = box4['strides'])
+            strides = box4['strides'])
 
 
         # Conv-Box-5
@@ -109,7 +106,7 @@ class CNN:
             strides= box5['strides']
         )
 
-        output_dim = ()
+        output_dim = tf.shape(pool5)[1:]
         pool5_flat =  tf.reshape(pool5, [-1, np.product(output_dim)])
 
         #dense layer 1
@@ -124,13 +121,54 @@ class CNN:
         batch_norm_dense_2 = tf.contrib.layers(inputs=dropout_2)
 
         #output layer
-        features =  tf.layers.dense(inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
+        features =  tf.layers.dense(name="forward", inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
 
         return features
 
+def loadConfig():
+    pass
+
 def main():
-    obj = CNN()
-    print obj.forward
-    # print obj.forward()
+
+    mnist = tf.contrib.learn.datasets.load_dataset("mnist")
+    train_data = mnist.train.images # Returns np.array
+    train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
+    eval_data = mnist.test.images # Returns np.array
+    eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
+    total = train_data.shape[0]
+    batch_size = 32
+    config = loadConfig('config.json')
+    cnn_object = CNN(config["CNN"])
+    forward_op = cnn_object.forward
+    probab = tf.nn.softmax(forward_op)
+    onehot_labels = tf.placeholder(tf.int32, shape=[-1, 10])
+    loss = tf.losses.softmax_cross_entropy(
+      onehot_labels=onehot_labels, logits=forward_op)
+
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+    train_op = optimizer.minimize(
+    loss=loss,
+    global_step=tf.train.get_global_step()
+    )
+    n_epochs=10
+    with tf.Session() as sess:
+        for epoch in range(n_epochs):
+            zipped = zip(train_data,train_labels)
+            X,y = zip(*zipped)
+            X = np.array(X)
+            y = np.array(y)
+            for i in range(0, total, batch_size):
+                x_curr_batch = X[i:i+batch_size]
+                y_curr = y[i:i+batch_size].reshape(-1)
+                one_hot_targets = np.eye(nb_classes)[y_curr]
+                loss_val = sess.run(loss, feed_dict={input_tensor:x_curr_batch, onehot_labels: one_hot_targets})
+                sess.run(train_op, feed_dict={input_tensor:x_curr_batch, onehot_labels: one_hot_targets})
+
+                print("epoch: "+str(epoch)+" loss: "+str(loss_val))
+
+
+
+
+
 
 main()
