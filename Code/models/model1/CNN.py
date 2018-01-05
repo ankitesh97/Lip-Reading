@@ -27,19 +27,19 @@ def define_scope(function):
 
 
 class CNN:
-    def __init__(self, config, is_training=True):
-        self.forward
+    def __init__(self, input_tensor, config, is_training=True):
         self.config = config
+        self.input_tensor = input_tensor
         self.is_training = is_training
+        self.forward
+
 
     @define_scope
     def forward(self):
         # Conv-Box 1
         box1 = self.config['Conv-Box-1']
-        inp_shape = self.config['Input_shape']
-        input_tensor = tf.placeholder(tf.float32, shape=[-1]+inp_shape)
         conv1 = tf.layers.conv2d(
-            inputs = input_tensor,
+            inputs = self.input_tensor,
             filters = box1['filters'],
             kernel_size = box1['kernel_size'],
             padding = "same",
@@ -100,34 +100,35 @@ class CNN:
             padding = "same",
             activation = mapActivationFunc(box5['activation']))
 
-        pool5 = tf.layers.conv2d(
+        pool5 = tf.layers.max_pooling2d(
             inputs=conv5,
             pool_size = box5['pool_size'],
             strides= box5['strides']
         )
 
-        output_dim = tf.shape(pool5)[1:]
+        output_dim = pool5.get_shape()[1:]
+
         pool5_flat =  tf.reshape(pool5, [-1, np.product(output_dim)])
 
         #dense layer 1
         dense_config = self.config["Dense"]
-        dense_1 =  tf.layers.dense(inputs=pool5_flat, units= dense_config['units_layer_1'], activation=mapActivationFunc[dense_config['activation']])
-        dropout_1 = tf.layers.dropout(inputs=dense_1, rate=dense_config['dropout_1_rate'], training=is_training)
-        batch_norm_dense_1 = tf.contrib.layers(inputs=dropout_1)
+        dense_1 =  tf.layers.dense(inputs=pool5_flat, units= dense_config['units_layer_1'], activation=mapActivationFunc(dense_config['activation']))
+        dropout_1 = tf.layers.dropout(inputs=dense_1, rate=dense_config['dropout_1_rate'], training=self.is_training)
+        batch_norm_dense_1 = tf.contrib.layers.batch_norm(inputs=dropout_1)
 
         #dense layer 2
-        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= dense_config['units_layer_2'], activation=mapActivationFunc[dense_config['activation']])
-        dropout_2 = tf.layers.dropout(inputs=dense_2, rate=dense_config['dropout_2_rate'], training=is_training)
-        batch_norm_dense_2 = tf.contrib.layers(inputs=dropout_2)
+        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= dense_config['units_layer_2'], activation=mapActivationFunc(dense_config['activation']))
+        dropout_2 = tf.layers.dropout(inputs=dense_2, rate=dense_config['dropout_2_rate'], training=self.is_training)
+        batch_norm_dense_2 = tf.contrib.layers.batch_norm(inputs=dropout_2)
 
         #output layer
         features =  tf.layers.dense(name="forward", inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
 
         return features
 
-def loadConfig():
-    pass
 
+
+#this function is to test the class
 def main():
 
     mnist = tf.contrib.learn.datasets.load_dataset("mnist")
@@ -138,10 +139,13 @@ def main():
     total = train_data.shape[0]
     batch_size = 32
     config = loadConfig('config.json')
-    cnn_object = CNN(config["CNN"])
+    inp_shape = config['CNN']['Input_shape']
+    input_te = tf.placeholder(tf.float32, shape=[None,28*28])
+    input_tensor = tf.reshape(input_te, [-1,28,28,1])
+    cnn_object = CNN(input_tensor,config["CNN"])
     forward_op = cnn_object.forward
     probab = tf.nn.softmax(forward_op)
-    onehot_labels = tf.placeholder(tf.int32, shape=[-1, 10])
+    onehot_labels = tf.placeholder(tf.int32, shape=[None, 10])
     loss = tf.losses.softmax_cross_entropy(
       onehot_labels=onehot_labels, logits=forward_op)
 
@@ -151,7 +155,12 @@ def main():
     global_step=tf.train.get_global_step()
     )
     n_epochs=10
+    nb_classes=10
+    init = tf.global_variables_initializer()
+    print(total)
     with tf.Session() as sess:
+        sess.run(init)
+
         for epoch in range(n_epochs):
             zipped = zip(train_data,train_labels)
             X,y = zip(*zipped)
@@ -161,8 +170,8 @@ def main():
                 x_curr_batch = X[i:i+batch_size]
                 y_curr = y[i:i+batch_size].reshape(-1)
                 one_hot_targets = np.eye(nb_classes)[y_curr]
-                loss_val = sess.run(loss, feed_dict={input_tensor:x_curr_batch, onehot_labels: one_hot_targets})
-                sess.run(train_op, feed_dict={input_tensor:x_curr_batch, onehot_labels: one_hot_targets})
+                loss_val = sess.run(loss, feed_dict={input_te:x_curr_batch, onehot_labels: one_hot_targets})
+                sess.run(train_op, feed_dict={input_te:x_curr_batch, onehot_labels: one_hot_targets})
 
                 print("epoch: "+str(epoch)+" loss: "+str(loss_val))
 
