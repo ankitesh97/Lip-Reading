@@ -21,6 +21,7 @@ def define_scope(function):
         if not hasattr(self, attribute):
             with tf.variable_scope('cnn_'+function.__name__):
                 setattr(self, attribute, function(self))
+
         return getattr(self, attribute)
 
     return decorator
@@ -122,7 +123,7 @@ class CNN:
         batch_norm_dense_2 = tf.contrib.layers.batch_norm(inputs=dropout_2)
 
         #output layer
-        features =  tf.layers.dense(name="forward", inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
+        features =  tf.layers.dense(name="forward_op_anki", inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
 
         return features
 
@@ -137,13 +138,14 @@ def main():
     eval_data = mnist.test.images # Returns np.array
     eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
     total = train_data.shape[0]
-    batch_size = 32
+    batch_size = 64
     config = loadConfig('config.json')
     inp_shape = config['CNN']['Input_shape']
     input_te = tf.placeholder(tf.float32, shape=[None,28*28])
     input_tensor = tf.reshape(input_te, [-1,28,28,1])
     cnn_object = CNN(input_tensor,config["CNN"])
     forward_op = cnn_object.forward
+    prdict = tf.nn.softmax(forward_op, name="prediction")
     probab = tf.nn.softmax(forward_op)
     onehot_labels = tf.placeholder(tf.int32, shape=[None, 10])
     loss = tf.losses.softmax_cross_entropy(
@@ -154,13 +156,14 @@ def main():
     loss=loss,
     global_step=tf.train.get_global_step()
     )
-    n_epochs=10
+    n_epochs=4
     nb_classes=10
     init = tf.global_variables_initializer()
     print(total)
+    saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(init)
-
+        writer = tf.summary.FileWriter('logs', graph=tf.get_default_graph())
         for epoch in range(n_epochs):
             zipped = zip(train_data,train_labels)
             X,y = zip(*zipped)
@@ -173,11 +176,13 @@ def main():
                 loss_val = sess.run(loss, feed_dict={input_te:x_curr_batch, onehot_labels: one_hot_targets})
                 sess.run(train_op, feed_dict={input_te:x_curr_batch, onehot_labels: one_hot_targets})
 
-                print("epoch: "+str(epoch)+" loss: "+str(loss_val))
+            print("epoch: "+str(epoch)+" loss: "+str(loss_val))
+
+        saver.save(sess, "./my-model")
 
 
 
 
-
-
-main()
+def loadTest():
+    pass
+# main()
