@@ -2,13 +2,15 @@ import os
 from Queue import Queue
 import numpy as np
 import cv2
-word_to_index = {'ABOUT':0,'ABUSE':1,'ABSOLUTELY':2}
+import getpass
+username = getpass.getuser()
+word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,'FAMILY':5,'GEORGE':6,'HAPPEN':7,'INDEPENDENT':8}
 
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
+    SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
@@ -17,9 +19,9 @@ def loadDataQueue(COLORFLAG=0):
     fileArray = []
     # if COLORFLAG==0:
     for word in os.listdir(DIRECTORY):
-        for fileName in os.listdir(DIRECTORY+word+'/test/'):
+        for fileName in os.listdir(DIRECTORY+word+'/train/'):
             if 'mp4' in fileName:
-                fileArray.append(DIRECTORY+word+'/test/'+fileName)
+                fileArray.append(DIRECTORY+word+'/train/'+fileName)
     np.random.shuffle(fileArray)
     for x in fileArray:
         totalTrainFileName.put(x)
