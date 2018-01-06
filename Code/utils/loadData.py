@@ -2,13 +2,23 @@ import os
 from Queue import Queue
 import numpy as np
 import cv2
+<<<<<<< HEAD
+=======
+import getpass
+username = getpass.getuser()
+>>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
 word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,'FAMILY':5,'GEORGE':6,'HAPPEN':7,'INDEPENDENT':8}
 
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
+<<<<<<< HEAD
     SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified/'
     COLOR_SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified-color/'
+=======
+    SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified-color/'
+>>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
@@ -17,10 +27,17 @@ def loadDataQueue(COLORFLAG=0):
     fileArray = []
     # if COLORFLAG==0:
     for word in os.listdir(DIRECTORY):
+<<<<<<< HEAD
         for fileName in os.listdir(DIRECTORY+word+'/test/'):
             if 'avi' in fileName:
                 fileArray.append(DIRECTORY+word+'/test/'+fileName)
     # np.random.shuffle(fileArray)
+=======
+        for fileName in os.listdir(DIRECTORY+word+'/train/'):
+            if 'mp4' in fileName:
+                fileArray.append(DIRECTORY+word+'/train/'+fileName)
+    np.random.shuffle(fileArray)
+>>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
     for x in fileArray:
         totalTrainFileName.put(x)
     return len(fileArray)
