@@ -39,8 +39,8 @@ class LSTM:
         last = tf.gather(output, int(output.get_shape()[0]) - 1) #Gather takes two values param and indices. works like slicing
         weight = tf.Variable(tf.truncated_normal([self.config["hidden_dim"],self.config['vocab_size']]))
         bias = tf.Variable(tf.truncated_normal([self.config["vocab_size"]]))
-        prediction = tf.nn.softmax(tf.matmul(last, weight) + bias)
-        return prediction
+        logits = tf.matmul(last, weight) + bias
+        return logits
 
 
 
