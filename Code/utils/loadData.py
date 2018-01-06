@@ -2,13 +2,13 @@ import os
 from Queue import Queue
 import numpy as np
 import cv2
-
+word_to_index = {'ABOUT':0,'ABUSE':1,'ABSOLUTELY':2}
 
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-    SOURCE_DIRECTORY = './modified/'
-    COLOR_SOURCE_DIRECTORY = './modified-color/'
+    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
@@ -39,7 +39,7 @@ def getNextBatch(batchSize,COLORFLAG=0):
     for x in range(forLoopRange):
         removedFromQueue = totalTrainFileName.get()
         # print removedFromQueue
-        finalNameReturn.append(removedFromQueue)
+        finalNameReturn.append(word_to_index[removedFromQueue.split('_')[0].split('/')[-1]])
         cap = cv2.VideoCapture(removedFromQueue)
         temp=[]
         for x in range(0,29):

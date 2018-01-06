@@ -16,8 +16,7 @@ from loadData import *
 
 #defines the train operation
 def train(onehot_labels, predicted, learning_rate):
-    loss = tf.losses.softmax_cross_entropy(
-      onehot_labels=onehot_labels, logits=predicted)
+    loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=predicted)
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
     minimize = optimizer.minimize(loss)
     return minimize, loss
