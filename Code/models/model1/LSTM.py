@@ -37,12 +37,12 @@ class LSTM:
         output,state = tf.nn.dynamic_rnn(cell,self.input_tesor,dtype=tf.float32)
         output = tf.transpose(output, [1, 0, 2])
         last = tf.gather(output, int(output.get_shape()[0]) - 1) #Gather takes two values param and indices. works like slicing
-        weight = tf.Variable(tf.truncated_normal([self.config["hidden_dim"],self.config['vocab_size']]))
-        bias = tf.Variable(tf.truncated_normal([self.config["vocab_size"]]))
-        logits = tf.matmul(last, weight) + bias
-        return logits
-
-
+        dense_config = self.config['Dense']
+        logits = tf.layers.dense(inputs=last,units=dense_config['units_layer_1'],activation=mapActivationFunc(dense_config['activation']))
+        dropout_1 = tf.layers.dropout(inputs=logits, rate=dense_config['dropout_1_rate'], training=self.is_training)
+        batch_norm_dense_1 = tf.contrib.layers.batch_norm(inputs=dropout_1)
+        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= dense_config['units_layer_2'], activation=mapActivationFunc(dense_config['activation']))
+        return dense_2
 
 #example for lstm class
 def main():
