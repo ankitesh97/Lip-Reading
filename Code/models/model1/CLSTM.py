@@ -83,7 +83,7 @@ def main():
 
             #take data
             X_acc,Y = getNextBatch(acc_size, is_colored)
-            X_acc /= 255.0
+            X_acc =X_acc/255.0
             Y = Y.reshape(-1)
             one_hot_targets = np.eye(nb_classes)[Y]
 
@@ -102,7 +102,8 @@ def main():
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"
 
         saver.save(sess, "./trained_models/clstmModel_final")
-        open("losses.txt", "w").write(json.dumps({"losses":Losses}))
+        print Losses
+        open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
 
     #define rnn operation
 

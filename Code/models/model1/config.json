@@ -52,7 +52,7 @@
     "Dense":
     {
       "activation": "relu",
-      "feature_dim": 10,
+      "feature_dim": 10
     }
 
   },
