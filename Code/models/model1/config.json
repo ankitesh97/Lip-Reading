@@ -52,12 +52,7 @@
     "Dense":
     {
       "activation": "relu",
-      "units_layer_1": 1024,
-      "units_layer_2": 512,
-      "dropout_1_rate": 0.4,
-      "dropout_2_rate": 0.2,
       "feature_dim": 10,
-      "acc_size":128
     }
 
   },

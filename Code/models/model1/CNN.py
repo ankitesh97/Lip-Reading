@@ -113,18 +113,7 @@ class CNN:
 
         #dense layer 1
         dense_config = self.config["Dense"]
-        dense_1 =  tf.layers.dense(inputs=pool5_flat, units= dense_config['units_layer_1'], activation=mapActivationFunc(dense_config['activation']))
-        dropout_1 = tf.layers.dropout(inputs=dense_1, rate=dense_config['dropout_1_rate'], training=self.is_training)
-        batch_norm_dense_1 = tf.contrib.layers.batch_norm(inputs=dropout_1)
-
-        #dense layer 2
-        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= dense_config['units_layer_2'], activation=mapActivationFunc(dense_config['activation']))
-        dropout_2 = tf.layers.dropout(inputs=dense_2, rate=dense_config['dropout_2_rate'], training=self.is_training)
-        batch_norm_dense_2 = tf.contrib.layers.batch_norm(inputs=dropout_2)
-
-        #output layer
-        features =  tf.layers.dense(name="forward_op_anki", inputs=batch_norm_dense_2, units= dense_config['feature_dim'])
-
+        features =  tf.layers.dense(inputs=pool5_flat, units= dense_config['feature_dim'])
         return features
 
 

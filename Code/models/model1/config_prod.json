@@ -52,28 +52,34 @@
     "Dense":
     {
       "activation": "relu",
-      "units_layer_1": 1024,
-      "units_layer_2": 512,
-      "dropout_1_rate": 0.4,
-      "dropout_2_rate": 0.2,
-      "feature_dim": 10
+      "feature_dim": 128,
     }
 
   },
 
   "LSTM":
   {
-    "hidden_dim":20,
-    "vocab_size":10,
-    "time_steps": 29
+    "hidden_dim":128,
+    "vocab_size":3,
+    "time_steps": 29,
+    "Dense":
+    {
+      "activation": "relu",
+      "units_layer_1": 256,
+      "units_layer_2": 128,
+      "dropout_1_rate": 0.25,
+      "dropout_2_rate": 0.4
+    }
 
   },
 
   "Training":{
-    "epochs":10,
-    "batch_size":32,
+    "epochs":100,
+    "batch_size":64,
     "is_training":1,
-    "is_colored":0
-
+    "is_colored":0,
+    "nb_classes":3,
+    "learning_rate":0.001,
+    "acc_size":128
   }
 }

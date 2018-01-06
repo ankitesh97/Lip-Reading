@@ -57,7 +57,7 @@ def main():
 
     saver = tf.train.Saver(max_to_keep=4)
     init = tf.global_variables_initializer()
-
+    Losses = []
     with tf.Session() as sess:
 
         sess.run(init)
@@ -72,6 +72,7 @@ def main():
                        break
             for i in range(0, total, batch_size):
                 X,y = getNextBatch(batch_size, is_colored)
+                X = X/255.0
                 y = y.reshape(-1)
                 one_hot_targets = np.eye(nb_classes)[y]
                 sess.run(train_op, feed_dict={sequence:X,onehot_labels:one_hot_targets, is_train:True})
@@ -82,13 +83,14 @@ def main():
 
             #take data
             X_acc,Y = getNextBatch(acc_size, is_colored)
+            X_acc /= 255.0
             Y = Y.reshape(-1)
             one_hot_targets = np.eye(nb_classes)[Y]
 
             predictions = sess.run(probabilities, feed_dict={sequence:X_acc,is_train:False})
             predicted_classes = sess.run(classes, feed_dict={sequence:X_acc, onehot_labels:one_hot_targets,is_train:False})
             loss_val = sess.run(loss,feed_dict={sequence:X_acc, onehot_labels:one_hot_targets,is_train:False})
-
+            Losses.append(loss_val)
             count=0
             for i in range(len(Y)):
                 if predicted_classes[i] == Y[i]:
@@ -100,7 +102,7 @@ def main():
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"
 
         saver.save(sess, "./trained_models/clstmModel_final")
-
+        open("losses.txt", "w").write(json.dumps({"losses":Losses}))
 
     #define rnn operation
 
