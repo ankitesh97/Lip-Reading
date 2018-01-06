@@ -7,7 +7,7 @@
     "Conv-Box-1":
     {
         "filters": 32,
-        "kernel_size":[5,5],
+        "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
         "strides":2
@@ -15,8 +15,8 @@
 
     "Conv-Box-2":
     {
-        "filters": 32,
-        "kernel_size":[5,5],
+        "filters": 64,
+        "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
         "strides":2
@@ -24,8 +24,8 @@
 
     "Conv-Box-3":
     {
-        "filters": 32,
-        "kernel_size":[5,5],
+        "filters": 80,
+        "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
         "strides":2
@@ -33,8 +33,8 @@
 
     "Conv-Box-4":
     {
-        "filters": 32,
-        "kernel_size":[5,5],
+        "filters": 192,
+        "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
         "strides":2
@@ -42,8 +42,8 @@
 
     "Conv-Box-5":
     {
-        "filters": 32,
-        "kernel_size":[5,5],
+        "filters": 288,
+        "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
         "strides":2
