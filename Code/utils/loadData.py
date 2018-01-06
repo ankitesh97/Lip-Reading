@@ -2,13 +2,13 @@ import os
 from Queue import Queue
 import numpy as np
 import cv2
-word_to_index = {'ABOUT':0,'ABUSE':1,'ABSOLUTELY':2}
+word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,'FAMILY':5,'GEORGE':6,'HAPPEN':7,'INDEPENDENT':8}
 
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
+    SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
@@ -18,9 +18,9 @@ def loadDataQueue(COLORFLAG=0):
     # if COLORFLAG==0:
     for word in os.listdir(DIRECTORY):
         for fileName in os.listdir(DIRECTORY+word+'/test/'):
-            if 'mp4' in fileName:
+            if 'avi' in fileName:
                 fileArray.append(DIRECTORY+word+'/test/'+fileName)
-    np.random.shuffle(fileArray)
+    # np.random.shuffle(fileArray)
     for x in fileArray:
         totalTrainFileName.put(x)
     return len(fileArray)
@@ -28,6 +28,7 @@ def loadDataQueue(COLORFLAG=0):
 def emptyDataQueue():
     for x in range(0,totalTrainFileName.qsize()):
         temp = totalTrainFileName.get()
+
 
 def getNextBatch(batchSize,COLORFLAG=0):
     finalDataReturn = []

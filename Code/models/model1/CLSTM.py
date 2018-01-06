@@ -14,6 +14,7 @@ from LSTM import LSTM
 from util import *
 from loadData import *
 import time
+import sys
 
 start = time.time()
 #defines the train operation
@@ -63,6 +64,7 @@ def main():
     with tf.Session() as sess:
 
         print "---------------Starting to train-------------"
+        sys.stdout.flush()
         sess.run(init)
         writer = tf.summary.FileWriter('logs', graph=tf.get_default_graph())
         for e in range(epochs):
@@ -72,6 +74,7 @@ def main():
                     control = f.read()
                     if control.strip() == "1":
                        print "-----------------stopping the training process .........."
+                       sys.stdout.flush()
                        break
             batch_count = 0
             for i in range(0, total, batch_size):
@@ -83,6 +86,7 @@ def main():
                 batch_count = batch_count + 1
                 if(batch_count%2==0):
                     print "Epoch: "+str(e)+" Batch: "+str(batch_count)
+                    sys.stdout.flush()
             saver.save(sess, './trained_models/clstmModel', global_step=e,write_meta_graph=False)
 
             emptyDataQueue()
@@ -107,6 +111,7 @@ def main():
             emptyDataQueue()
 
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"
+            sys.stdout.flush()
 
         saver.save(sess, "./trained_models/clstmModel_final")
         print Losses
@@ -114,5 +119,37 @@ def main():
 
     #define rnn operation
 
+def test():
 
-main()
+
+    with tf.Session() as sess:
+
+        new_saver = tf.train.import_meta_graph('./trained_models/clstmModel_final.meta')
+        new_saver.restore(sess, tf.train.latest_checkpoint('./trained_models'))
+        graph = tf.get_default_graph()
+        sequence = graph.get_tensor_by_name("input_seq:0")
+        is_train = graph.get_tensor_by_name("Placeholder:0")
+        onehot_labels = graph.get_tensor_by_name("onehot:0")
+        total = loadDataQueue()
+        X, y = getNextBatch(total)
+        y2 = y.reshape(-1)
+        one_hot_targets = np.eye(9)[y2]
+
+        # input_tensor = tf.reshape(input_te, [-1,28,28,1])
+        preds =  sess.run('predict:0',feed_dict={sequence:X, is_train:False, onehot_labels:one_hot_targets})
+        classes = tf.argmax(preds, axis=1)
+        preds_classes = sess.run(classes)
+        print len(preds_classes)
+        print preds_classes
+        print "actual"
+        print len(y)
+        print y
+        count=0
+        for i in range(len(preds_classes)):
+            if preds_classes[i] == y[i]:
+                count = count + 1
+        print count
+        print ((count*1.0)/len(preds_classes)) * 100
+
+# main()
+test()
