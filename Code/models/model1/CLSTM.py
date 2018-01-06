@@ -60,22 +60,27 @@ def main():
     Losses = []
     with tf.Session() as sess:
 
+        print "---------------Starting to train-------------"
         sess.run(init)
         writer = tf.summary.FileWriter('logs', graph=tf.get_default_graph())
         for e in range(epochs):
             total = loadDataQueue(is_colored)
-            if(e%5==0):
+            if(e%3==0):
                 with open("control.txt",'r') as f:
                     control = f.read()
                     if control.strip() == "1":
                        print "-----------------stopping the training process .........."
                        break
+            batch_count = 0
             for i in range(0, total, batch_size):
                 X,y = getNextBatch(batch_size, is_colored)
                 X = X/255.0
                 y = y.reshape(-1)
                 one_hot_targets = np.eye(nb_classes)[y]
                 sess.run(train_op, feed_dict={sequence:X,onehot_labels:one_hot_targets, is_train:True})
+                batch_count = batch_count + 1
+                if(batch_count%2==0):
+                    print "Epoch: "+str(e)+" Batch: "+str(batch_count)
             saver.save(sess, './trained_models/clstmModel', global_step=e,write_meta_graph=False)
 
             emptyDataQueue()
@@ -106,5 +111,6 @@ def main():
         open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
 
     #define rnn operation
+
 
 main()

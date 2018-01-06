@@ -6,7 +6,7 @@
     "Input_shape":[72,42,1],
     "Conv-Box-1":
     {
-        "filters": 32,
+        "filters": 8,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -15,7 +15,7 @@
 
     "Conv-Box-2":
     {
-        "filters": 64,
+        "filters": 16,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -24,7 +24,7 @@
 
     "Conv-Box-3":
     {
-        "filters": 80,
+        "filters": 32,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -33,7 +33,7 @@
 
     "Conv-Box-4":
     {
-        "filters": 192,
+        "filters": 64,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -42,7 +42,7 @@
 
     "Conv-Box-5":
     {
-        "filters": 288,
+        "filters": 80,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -52,7 +52,7 @@
     "Dense":
     {
       "activation": "relu",
-      "feature_dim": 128,
+      "feature_dim": 128
     }
 
   },
