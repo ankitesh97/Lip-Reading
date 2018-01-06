@@ -10,13 +10,16 @@ globalCounterPrevious = 0
 globalCounterTotal = 0
 SOURCE_DIRECTORY = 'original/'
 TARGET_DIRECTORY = 'modified/'
+COLOR_TARGET_DIRECTORY = 'modified-color/'
 words = os.listdir(SOURCE_DIRECTORY)
 bakwasFile = open('bakwasFile.txt','w')
 for word in words:
     os.mkdir(TARGET_DIRECTORY+word)
+    os.mkdir(COLOR_TARGET_DIRECTORY+word)
     for setType in ['/test/','/train/','/val/']:
         testSet = os.listdir(SOURCE_DIRECTORY + word + setType)
         os.mkdir(TARGET_DIRECTORY+word+setType)
+        os.mkdir(COLOR_TARGET_DIRECTORY+word+setType)
         for files in testSet:
             if files.endswith('.mp4'):
                 videoFileName = files
@@ -31,7 +34,8 @@ for word in words:
                 print fileFrames,frameRangeStart,frameRangeEnd,videoFileName,setType
                 cap = cv2.VideoCapture(SOURCE_DIRECTORY+word+setType+videoFileName)
                 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-                out = cv2.VideoWriter(TARGET_DIRECTORY+word+setType+videoFileName.replace('mp4','avi'),fourcc,1,(72, 43))
+                out = cv2.VideoWriter(TARGET_DIRECTORY+word+setType+videoFileName,fourcc,1,(72, 43),isColor=0)
+                outColor = cv2.VideoWriter(COLOR_TARGET_DIRECTORY+word+setType+videoFileName,fourcc,1,(72, 43),isColor=1)
                 ctr = 0
                 default_mouth_rects = []
                 bakwasFileFlag = False
@@ -43,6 +47,7 @@ for word in words:
                     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     mouth_rects = mouth_cascade.detectMultiScale(gray, 1.7, 5)
                     if len(mouth_rects)!=0:
+                        # print mouth_rects
                         finalIndex = 10
                         for x in range(0,len(mouth_rects)):
                             if mouth_rects[x][2]==43 and mouth_rects[x][3]==72:
@@ -50,16 +55,18 @@ for word in words:
                         if finalIndex!=10:
                             default_mouth_rects = [mouth_rects[finalIndex]]
                             break
-                        # default_mouth_rects = mouth_rects
-                        # print 'I got mouth rects in frame ',ctr
-                    if ctr==28 and len(mouth_rects)==0:
-                        bakwasFile.write(TARGET_DIRECTORY+word+setType+videoFileName.replace('mp4','avi')+'\n')
+                    if ctr==28 and len(default_mouth_rects)==0:
+                        bakwasFile.write('./'+TARGET_DIRECTORY+word+setType+videoFileName+'\n')
+                        bakwasFile.write('./'+COLOR_TARGET_DIRECTORY+word+setType+videoFileName+'\n')
                         bakwasFileFlag = True
                     ctr+=1
                 # print '=======First Loop Ends=============='
                 printedFrames = 0
-                if bakwasFileFlag ==False:
+                if bakwasFileFlag ==True:
+                    print 'Omitting file ',videoFileName
+                else:
                     ctr = 0
+                    # print default_mouth_rects
                     previous_mouth_rects = default_mouth_rects
                     previous_mouth_rects[0][2]=43
                     previous_mouth_rects[0][3]=72
@@ -99,15 +106,27 @@ for word in words:
                                 x,y,w,h = previous_mouth_rects[finalIndex][0],previous_mouth_rects[finalIndex][1],previous_mouth_rects[finalIndex][2],previous_mouth_rects[finalIndex][3]
                             cropped_img = frame[y:y+w,x:x+h]
                             # print cropped_img.shape
-                            out.write(cropped_img)
+                            final_img = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2GRAY)
+                            final_img_color = cropped_img
+                            out.write(final_img)
+                            outColor.write(final_img_color)
                             printedFrames+=1
                         ctr+=1
                     # print '=======Second Loop Ends=============='
                     # print printedFrames, fileFrames
                     for paddingFrame in range(0,int(29-fileFrames)):
                         black_image = np.zeros((43,72,3), np.uint8)
-                        out.write(black_image)
+                        final_img = cv2.cvtColor(black_image, cv2.COLOR_BGR2GRAY)
+                        final_img_color = black_image
+                        out.write(final_img)
+                        outColor.write(final_img_color)
                         printedFrames+=1
                     if printedFrames!=29:
                         print 'Not proper'
+bakwasFile.close()
 print 'Took Previous frames % :',float(globalCounterPrevious)/globalCounterTotal*100,"%"
+f = open('./bakwasFile.txt','r')
+lines = f.readlines()
+for x in lines:
+    print x
+    os.remove(x[:-1])
