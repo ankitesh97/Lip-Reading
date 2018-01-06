@@ -65,7 +65,7 @@
   "LSTM":
   {
     "hidden_dim":20,
-    "vocab_size":10,
+    "vocab_size":3,
     "time_steps": 29
 
   },
@@ -76,7 +76,8 @@
     "is_training":1,
     "is_colored":0,
     "nb_classes":3,
-    "learning_rate":0.001
+    "learning_rate":0.001,
+    "acc_size":128
 
   }
 }
