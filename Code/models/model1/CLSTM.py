@@ -38,7 +38,7 @@ def main():
     cnn_output = tf.map_fn(cnn_forward_op, sequence, dtype=tf.float32, swap_memory=True)
     cnn_output = tf.transpose(cnn_output, [1, 0, 2])
 
-    lstm_op_forward = LSTM(cnn_output,config["LSTM"]).forward
+    lstm_op_forward = LSTM(cnn_output,config["LSTM"],is_training=is_train).forward
 
     nb_classes = training_params['nb_classes']
     learning_rate = training_params['learning_rate']
