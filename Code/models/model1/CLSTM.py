@@ -13,7 +13,9 @@ from CNN import CNN
 from LSTM import LSTM
 from util import *
 from loadData import *
+import time
 
+start = time.time()
 #defines the train operation
 def train(onehot_labels, predicted, learning_rate):
     loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=predicted)
