@@ -3,17 +3,17 @@ from Queue import Queue
 import numpy as np
 import cv2
 
-COLORFLAG = 0
-SOURCE_DIRECTORY = './modified/'
-COLOR_SOURCE_DIRECTORY = './modified-color/'
-DIRECTORY=''
-if COLORFLAG==0:
-    DIRECTORY = SOURCE_DIRECTORY
-else :
-    DIRECTORY = COLOR_SOURCE_DIRECTORY
+
 totalTrainFileName = Queue()
 
-def loadDataQueue():
+def loadDataQueue(COLORFLAG=0):
+    SOURCE_DIRECTORY = './modified/'
+    COLOR_SOURCE_DIRECTORY = './modified-color/'
+    DIRECTORY=''
+    if COLORFLAG==0:
+        DIRECTORY = SOURCE_DIRECTORY
+    else :
+        DIRECTORY = COLOR_SOURCE_DIRECTORY
     fileArray = []
     # if COLORFLAG==0:
     for word in os.listdir(DIRECTORY):
@@ -23,10 +23,15 @@ def loadDataQueue():
     np.random.shuffle(fileArray)
     for x in fileArray:
         totalTrainFileName.put(x)
+    return len(fileArray)
 
+def emptyDataQueue():
+    for x in range(0,totalTrainFileName.qsize()):
+        temp = totalTrainFileName.get()
 
-def getNextBatch(batchSize):
+def getNextBatch(batchSize,COLORFLAG=0):
     finalDataReturn = []
+    finalNameReturn=[]
     if batchSize<=totalTrainFileName.qsize():
         forLoopRange = batchSize
     else:
@@ -34,10 +39,12 @@ def getNextBatch(batchSize):
     for x in range(forLoopRange):
         removedFromQueue = totalTrainFileName.get()
         # print removedFromQueue
+        finalNameReturn.append(removedFromQueue)
         cap = cv2.VideoCapture(removedFromQueue)
         temp=[]
         for x in range(0,29):
             ret,frame = cap.read()
+            frame = np.swapaxes(frame, 0,1)
             if COLORFLAG==0:
                 temp.append(frame[:,:,0])
             else:
@@ -48,7 +55,7 @@ def getNextBatch(batchSize):
         else:
             temp3 = temp
         finalDataReturn.append(temp3)
-    return np.array(finalDataReturn)
+    return np.array(np.swapaxes(finalDataReturn,0,1)),np.array(finalNameReturn)
 #
 # loadDataQueue()
 # data = getNextBatch(4)

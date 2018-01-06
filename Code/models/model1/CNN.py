@@ -177,12 +177,11 @@ def main():
                 sess.run(train_op, feed_dict={input_te:x_curr_batch, onehot_labels: one_hot_targets})
 
             print("epoch: "+str(epoch)+" loss: "+str(loss_val))
+            saver.save(sess, './trained_models/clstmModel', global_step=epoch,write_meta_graph=False, max_to_keep=4)
 
-        saver.save(sess, "./my-model")
+        saver.save(sess, "./trained_models/clstmModel_final")
 
 
 
 
-def loadTest():
-    pass
 # main()
