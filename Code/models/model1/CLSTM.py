@@ -26,7 +26,7 @@ def train(onehot_labels, predicted, learning_rate):
 
 
 def main():
-    config = loadConfig('config.json')
+    config = loadConfig('config_prod.json')
     training_params = config["Training"]
 
     #define cnn operation
@@ -87,7 +87,8 @@ def main():
                 if(batch_count%2==0):
                     print "Epoch: "+str(e)+" Batch: "+str(batch_count)
                     sys.stdout.flush()
-            saver.save(sess, './trained_models/clstmModel', global_step=e,write_meta_graph=False)
+            if(e%3==0):
+                saver.save(sess, './trained_models/modelv2/clstmModel', global_step=e,write_meta_graph=False)
 
             emptyDataQueue()
             loadDataQueue(is_colored)
@@ -110,10 +111,10 @@ def main():
             acc_train = (count*(1.0)/len(predicted_classes)) *100
             emptyDataQueue()
 
-            print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"
+            print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"+" Count "+str(count)
             sys.stdout.flush()
 
-        saver.save(sess, "./trained_models/clstmModel_final")
+        saver.save(sess, "./trained_models/modelv2/clstmModel_final")
         print Losses
         open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
 
@@ -124,14 +125,15 @@ def test():
 
     with tf.Session() as sess:
 
-        new_saver = tf.train.import_meta_graph('./trained_models/clstmModel_final.meta')
-        new_saver.restore(sess, tf.train.latest_checkpoint('./trained_models'))
+        new_saver = tf.train.import_meta_graph('./trained_models/modelv2/clstmModel_final.meta')
+        new_saver.restore(sess, tf.train.latest_checkpoint('./trained_models/modelv2'))
         graph = tf.get_default_graph()
         sequence = graph.get_tensor_by_name("input_seq:0")
         is_train = graph.get_tensor_by_name("Placeholder:0")
         onehot_labels = graph.get_tensor_by_name("onehot:0")
-        total = loadDataQueue()
-        X, y = getNextBatch(total)
+        total = loadDataQueue(1)
+        X, y = getNextBatch(total, 1)
+        X = X/255.0
         y2 = y.reshape(-1)
         one_hot_targets = np.eye(9)[y2]
 

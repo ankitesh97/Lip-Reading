@@ -3,7 +3,7 @@
 {
   "CNN":
   {
-    "Input_shape":[72,42,1],
+    "Input_shape":[72,42,3],
     "Conv-Box-1":
     {
         "filters": 8,
@@ -60,7 +60,7 @@
   "LSTM":
   {
     "hidden_dim":128,
-    "vocab_size":3,
+    "vocab_size":9,
     "time_steps": 29,
     "Dense":
     {
@@ -74,12 +74,12 @@
   },
 
   "Training":{
-    "epochs":100,
+    "epochs":200,
     "batch_size":64,
     "is_training":1,
-    "is_colored":0,
-    "nb_classes":3,
+    "is_colored":1,
+    "nb_classes":9,
     "learning_rate":0.001,
-    "acc_size":128
+    "acc_size":256
   }
 }
