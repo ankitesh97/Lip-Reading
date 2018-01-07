@@ -80,6 +80,8 @@
     "is_colored":1,
     "nb_classes":9,
     "learning_rate":0.001,
-    "acc_size":256
+    "acc_size":256,
+    "save_file_address":"./trained_models/modelv2/"
+
   }
 }

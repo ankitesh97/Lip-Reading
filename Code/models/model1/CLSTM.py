@@ -18,6 +18,12 @@ import sys
 
 start = time.time()
 #defines the train operation
+CONFIG_FILE = 'config.json'
+
+dynamic_config = loadConfig(CONFIG_FILE)
+train_flag = dynamic_config['Training']['is_training']
+model_save_add = dynamic_config["Training"]['save_file_address']
+
 def train(onehot_labels, predicted, learning_rate):
     loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=predicted)
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
@@ -88,7 +94,7 @@ def main():
                     print "Epoch: "+str(e)+" Batch: "+str(batch_count)
                     sys.stdout.flush()
             if(e%3==0):
-                saver.save(sess, './trained_models/modelv2/clstmModel', global_step=e,write_meta_graph=False)
+                saver.save(sess, model_save_add+'clstmModel', global_step=e,write_meta_graph=False)
 
             emptyDataQueue()
             loadDataQueue(is_colored)
@@ -114,7 +120,7 @@ def main():
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"+" Count "+str(count)
             sys.stdout.flush()
 
-        saver.save(sess, "./trained_models/modelv2/clstmModel_final")
+        saver.save(sess, model_save_add+"clstmModel_final")
         print Losses
         open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
 
@@ -123,16 +129,18 @@ def main():
 def test():
 
 
+    c = loadConfig(CONFIG_FILE)
+    color_flag = c['Training']['is_colored']
     with tf.Session() as sess:
 
-        new_saver = tf.train.import_meta_graph('./trained_models/modelv2/clstmModel_final.meta')
-        new_saver.restore(sess, tf.train.latest_checkpoint('./trained_models/modelv2'))
+        new_saver = tf.train.import_meta_graph(model_save_add+'clstmModel_final.meta')
+        new_saver.restore(sess, tf.train.latest_checkpoint(model_save_add))
         graph = tf.get_default_graph()
         sequence = graph.get_tensor_by_name("input_seq:0")
         is_train = graph.get_tensor_by_name("Placeholder:0")
         onehot_labels = graph.get_tensor_by_name("onehot:0")
-        total = loadDataQueue(1)
-        X, y = getNextBatch(total, 1)
+        total = loadDataQueue(color_flag)
+        X, y = getNextBatch(total, color_flag)
         X = X/255.0
         y2 = y.reshape(-1)
         one_hot_targets = np.eye(9)[y2]
@@ -153,5 +161,11 @@ def test():
         print count
         print ((count*1.0)/len(preds_classes)) * 100
 
-# main()
-test()
+
+
+
+if __name__ == '__main__':
+    if train_flag:
+        main()
+    else:
+        test()
