@@ -1,43 +1,30 @@
+def load_src(name, fpath):
+    import os, imp
+    return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
+
 import os
 from Queue import Queue
 import numpy as np
 import cv2
-<<<<<<< HEAD
-=======
-import getpass
-username = getpass.getuser()
->>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
-word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,'FAMILY':5,'GEORGE':6,'HAPPEN':7,'INDEPENDENT':8}
-
+load_src("wordDict", "./wordDict.py")
+from wordDict import *
+# word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,'FAMILY':5,'GEORGE':6,'HAPPEN':7,'INDEPENDENT':8}
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-<<<<<<< HEAD
-    SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified-color/'
-=======
-    SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/'+str(username)+'/Desktop/Lip-Reading/Data/modified-color/'
->>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
+    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
     else :
         DIRECTORY = COLOR_SOURCE_DIRECTORY
     fileArray = []
-    # if COLORFLAG==0:
     for word in os.listdir(DIRECTORY):
-<<<<<<< HEAD
-        for fileName in os.listdir(DIRECTORY+word+'/test/'):
-            if 'avi' in fileName:
-                fileArray.append(DIRECTORY+word+'/test/'+fileName)
-    # np.random.shuffle(fileArray)
-=======
         for fileName in os.listdir(DIRECTORY+word+'/train/'):
-            if 'mp4' in fileName:
+            if 'avi' in fileName:
                 fileArray.append(DIRECTORY+word+'/train/'+fileName)
     np.random.shuffle(fileArray)
->>>>>>> 67cbefeb09f8f0596501fed880ff0c4d42a94756
     for x in fileArray:
         totalTrainFileName.put(x)
     return len(fileArray)
@@ -56,7 +43,6 @@ def getNextBatch(batchSize,COLORFLAG=0):
         forLoopRange = totalTrainFileName.qsize()
     for x in range(forLoopRange):
         removedFromQueue = totalTrainFileName.get()
-        # print removedFromQueue
         finalNameReturn.append(word_to_index[removedFromQueue.split('_')[0].split('/')[-1]])
         cap = cv2.VideoCapture(removedFromQueue)
         temp=[]
@@ -74,15 +60,3 @@ def getNextBatch(batchSize,COLORFLAG=0):
             temp3 = temp
         finalDataReturn.append(temp3)
     return np.array(np.swapaxes(finalDataReturn,0,1)),np.array(finalNameReturn)
-#
-# loadDataQueue()
-# data = getNextBatch(4)
-# print data
-# data = getNextBatch(4)
-# print data.shape
-# data = getNextBatch(4)
-# print data.shape
-# data = getNextBatch(4)
-# print data.shape
-#
-# print totalTrainFileName.qsize()
