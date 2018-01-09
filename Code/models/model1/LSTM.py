@@ -33,15 +33,19 @@ class LSTM:
 
     @define_scope
     def forward(self):
-        cell = tf.nn.rnn_cell.LSTMCell(self.config["hidden_dim"],state_is_tuple=True)
+        cell = tf.nn.rnn_cell.LSTMCell(self.config["hidden_dim"],state_is_tuple=True, initializer=tf.truncated_normal_initializer(stddev=0.02))
         output,state = tf.nn.dynamic_rnn(cell,self.input_tesor,dtype=tf.float32)
         output = tf.transpose(output, [1, 0, 2])
         last = tf.gather(output, int(output.get_shape()[0]) - 1) #Gather takes two values param and indices. works like slicing
         dense_config = self.config['Dense']
-        logits = tf.layers.dense(inputs=last,units=dense_config['units_layer_1'],activation=mapActivationFunc(dense_config['activation']))
+        logits = tf.layers.dense(inputs=last,units=dense_config['units_layer_1'],activation=mapActivationFunc(dense_config['activation']),
+        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+        bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
         dropout_1 = tf.layers.dropout(inputs=logits, rate=dense_config['dropout_1_rate'], training=self.is_training)
         batch_norm_dense_1 = tf.contrib.layers.batch_norm(inputs=dropout_1)
-        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= self.config['vocab_size'], activation=mapActivationFunc(dense_config['activation']))
+        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= self.config['vocab_size'], activation=mapActivationFunc(dense_config['activation']),
+        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+        bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
         return dense_2
 
 #example for lstm class

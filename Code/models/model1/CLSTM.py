@@ -63,7 +63,7 @@ def main():
     is_colored = training_params['is_colored']
     batch_size = training_params['batch_size']
     acc_size = training_params['acc_size']
-
+    print is_colored
     saver = tf.train.Saver(max_to_keep=4)
     init = tf.global_variables_initializer()
     Losses = []
@@ -143,7 +143,7 @@ def test():
         X, y = getNextBatch(total, color_flag)
         X = X/255.0
         y2 = y.reshape(-1)
-        one_hot_targets = np.eye(9)[y2]
+        one_hot_targets = np.eye(3)[y2]
 
         # input_tensor = tf.reshape(input_te, [-1,28,28,1])
         preds =  sess.run('predict:0',feed_dict={sequence:X, is_train:False, onehot_labels:one_hot_targets})

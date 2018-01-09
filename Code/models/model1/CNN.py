@@ -44,7 +44,9 @@ class CNN:
             filters = box1['filters'],
             kernel_size = box1['kernel_size'],
             padding = "same",
-            activation = mapActivationFunc(box1['activation']))
+            activation = mapActivationFunc(box1['activation']),
+            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+            bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
         pool1 = tf.layers.max_pooling2d(
             inputs=conv1,
@@ -59,7 +61,9 @@ class CNN:
             filters = box2['filters'],
             kernel_size = box2['kernel_size'],
             padding = "same",
-            activation = mapActivationFunc(box2['activation']))
+            activation = mapActivationFunc(box2['activation']),
+            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+            bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
         pool2 = tf.layers.max_pooling2d(
             inputs=conv2,
@@ -74,7 +78,9 @@ class CNN:
             filters = box3['filters'],
             kernel_size = box3['kernel_size'],
             padding = "same",
-            activation = mapActivationFunc(box3['activation']))
+            activation = mapActivationFunc(box3['activation']),
+            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+            bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
 
         # Conv-Box-4
@@ -84,7 +90,9 @@ class CNN:
             filters = box4['filters'],
             kernel_size = box4['kernel_size'],
             padding = "same",
-            activation = mapActivationFunc(box4['activation']))
+            activation = mapActivationFunc(box4['activation']),
+            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+            bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
         pool4 = tf.layers.max_pooling2d(
             inputs=conv4,
@@ -99,7 +107,9 @@ class CNN:
             filters = box5['filters'],
             kernel_size = box5['kernel_size'],
             padding = "same",
-            activation = mapActivationFunc(box5['activation']))
+            activation = mapActivationFunc(box5['activation']),
+            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+            bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
         pool5 = tf.layers.max_pooling2d(
             inputs=conv5,
@@ -113,7 +123,8 @@ class CNN:
 
         #dense layer 1
         dense_config = self.config["Dense"]
-        features =  tf.layers.dense(inputs=pool5_flat, units= dense_config['feature_dim'])
+        features =  tf.layers.dense(inputs=pool5_flat, units= dense_config['feature_dim'],kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
+        bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
         return features
 
 
