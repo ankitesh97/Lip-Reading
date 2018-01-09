@@ -18,7 +18,7 @@ import sys
 
 start = time.time()
 #defines the train operation
-CONFIG_FILE = 'config.json'
+CONFIG_FILE = 'config_prod.json'
 
 dynamic_config = loadConfig(CONFIG_FILE)
 train_flag = dynamic_config['Training']['is_training']

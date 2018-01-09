@@ -3,17 +3,8 @@
 {
   "CNN":
   {
-    "Input_shape":[72,42,3],
+    "Input_shape":[72,42,1],
     "Conv-Box-1":
-    {
-        "filters": 8,
-        "kernel_size":[3,3],
-        "activation": "relu",
-        "pool_size": [2,2],
-        "strides":2
-    },
-
-    "Conv-Box-2":
     {
         "filters": 16,
         "kernel_size":[3,3],
@@ -22,7 +13,7 @@
         "strides":2
     },
 
-    "Conv-Box-3":
+    "Conv-Box-2":
     {
         "filters": 32,
         "kernel_size":[3,3],
@@ -31,7 +22,7 @@
         "strides":2
     },
 
-    "Conv-Box-4":
+    "Conv-Box-3":
     {
         "filters": 64,
         "kernel_size":[3,3],
@@ -40,9 +31,18 @@
         "strides":2
     },
 
-    "Conv-Box-5":
+    "Conv-Box-4":
     {
         "filters": 80,
+        "kernel_size":[3,3],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-5":
+    {
+        "filters": 64,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -60,7 +60,7 @@
   "LSTM":
   {
     "hidden_dim":128,
-    "vocab_size":9,
+    "vocab_size":500,
     "time_steps": 29,
     "Dense":
     {
@@ -74,14 +74,13 @@
   },
 
   "Training":{
-    "epochs":200,
-    "batch_size":64,
+    "epochs":50,
+    "batch_size":1024,
     "is_training":1,
-    "is_colored":1,
-    "nb_classes":9,
+    "is_colored":0,
+    "nb_classes":500,
     "learning_rate":0.001,
     "acc_size":256,
     "save_file_address":"./trained_models/modelv2/"
-
   }
 }
