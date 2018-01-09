@@ -3,17 +3,8 @@
 {
   "CNN":
   {
-    "Input_shape":[72,42,3],
+    "Input_shape":[72,42,1],
     "Conv-Box-1":
-    {
-        "filters": 8,
-        "kernel_size":[3,3],
-        "activation": "relu",
-        "pool_size": [2,2],
-        "strides":2
-    },
-
-    "Conv-Box-2":
     {
         "filters": 16,
         "kernel_size":[3,3],
@@ -22,7 +13,7 @@
         "strides":2
     },
 
-    "Conv-Box-3":
+    "Conv-Box-2":
     {
         "filters": 32,
         "kernel_size":[3,3],
@@ -31,7 +22,7 @@
         "strides":2
     },
 
-    "Conv-Box-4":
+    "Conv-Box-3":
     {
         "filters": 64,
         "kernel_size":[3,3],
@@ -40,9 +31,18 @@
         "strides":2
     },
 
-    "Conv-Box-5":
+    "Conv-Box-4":
     {
         "filters": 80,
+        "kernel_size":[3,3],
+        "activation": "relu",
+        "pool_size": [2,2],
+        "strides":2
+    },
+
+    "Conv-Box-5":
+    {
+        "filters": 64,
         "kernel_size":[3,3],
         "activation": "relu",
         "pool_size": [2,2],
@@ -52,7 +52,7 @@
     "Dense":
     {
       "activation": "relu",
-      "feature_dim": 128
+      "feature_dim": 100
     }
 
   },
@@ -60,28 +60,28 @@
   "LSTM":
   {
     "hidden_dim":128,
-    "vocab_size":9,
+    "vocab_size":3,
     "time_steps": 29,
     "Dense":
     {
       "activation": "relu",
       "units_layer_1": 256,
       "units_layer_2": 128,
-      "dropout_1_rate": 0.25,
-      "dropout_2_rate": 0.4
+      "dropout_1_rate": 0.20,
+      "dropout_2_rate": 0.6
     }
 
   },
 
   "Training":{
-    "epochs":200,
-    "batch_size":64,
-    "is_training":1,
-    "is_colored":1,
-    "nb_classes":9,
-    "learning_rate":0.001,
+    "epochs":50,
+    "batch_size":256,
+    "is_training":0,
+    "is_colored":0,
+    "nb_classes":3,
+    "learning_rate":0.002,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv2/"
+    "save_file_address":"./trained_models/modelv5/"
 
   }
 }
