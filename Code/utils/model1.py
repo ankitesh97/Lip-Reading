@@ -22,9 +22,14 @@ def mapActivationFunc(activation_name):
 def loadConfig(filename):
     with open(filename) as json_data:
         d = json.load(json_data)
+    
+
+def lossPlot(filename):
+    with open(filename) as json_data:
+        d = json.load(json_data)
         x = range(0, len(d["losses"]))
         y = d["losses"]
         pyplot.plot(x,y)
         pyplot.show()
 
-loadConfig('losses.txt')
+lossPlot('losses.txt')
