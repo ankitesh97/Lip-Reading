@@ -101,5 +101,9 @@ ENV/
 .mypy_cache/
 
 DataMinimal/
+Data/
+models/model1/logs
+models/model2/logs
+
 
 Code/models/model1/trained_models
