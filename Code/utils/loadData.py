@@ -16,8 +16,8 @@ import cv2
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
+    SOURCE_DIRECTORY = '/home/ankitesh/preprocess/Data/modified/'
+    COLOR_SOURCE_DIRECTORY = '/home/ankitesh/preprocess/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
