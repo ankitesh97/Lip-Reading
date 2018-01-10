@@ -78,6 +78,17 @@
 
   },
 
+  "final_layer":{
+    "activation": "relu",
+    "units_layer_1": 1024,
+    "units_layer_2": 512,
+    "units_layer_3": 256,
+    "dropout_1_rate": 0.42,
+    "dropout_2_rate": 0.25,
+    "feature_dim": 100,
+    "acc_size":128
+  },
+
   "Training":{
     "epochs":50,
     "batch_size":256,
