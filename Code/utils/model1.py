@@ -1,7 +1,7 @@
 
 import tensorflow as tf
 import json
-from matplotlib import pyplot
+# from matplotlib import pyplot
 
 def mapActivationFunc(activation_name):
 
@@ -20,16 +20,16 @@ def mapActivationFunc(activation_name):
 
 
 def loadConfig(filename):
-    with open(filename) as json_data:
-        d = json.load(json_data)
-    
-
-def lossPlot(filename):
-    with open(filename) as json_data:
-        d = json.load(json_data)
-        x = range(0, len(d["losses"]))
-        y = d["losses"]
-        pyplot.plot(x,y)
-        pyplot.show()
-
-lossPlot('losses.txt')
+	with open(filename) as json_data:
+		d = json.load(json_data)
+		return d
+#
+# def lossPlot(filename):
+#     with open(filename) as json_data:
+#         d = json.load(json_data)
+#         x = range(0, len(d["losses"]))
+#         y = d["losses"]
+#         pyplot.plot(x,y)
+#         pyplot.show()
+#
+# lossPlot('losses.txt')

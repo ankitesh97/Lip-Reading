@@ -52,8 +52,13 @@
     "Dense":
     {
       "activation": "relu",
-      "feature_dim": 100
-    }
+      "units_layer_1": 1024,
+      "units_layer_2": 512,
+      "dropout_1_rate": 0.4,
+      "dropout_2_rate": 0.2,
+      "feature_dim": 2,
+      "acc_size":128
+  }
 
   },
 
@@ -76,11 +81,11 @@
   "Training":{
     "epochs":50,
     "batch_size":256,
-    "is_training":1,
+    "is_training":0,
     "is_colored":0,
-    "nb_classes":500,
+    "nb_classes":2,
     "learning_rate":0.002,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv5/"
+    "save_file_address":"./trained_models/modelv1/"
   }
 }
