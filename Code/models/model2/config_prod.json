@@ -90,13 +90,13 @@
   },
 
   "Training":{
-    "epochs":50,
+    "epochs":5,
     "batch_size":64,
     "is_training":0,
     "is_colored":0,
     "nb_classes":9,
     "learning_rate":0.002,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv1/"
+    "save_file_address":"./trained_models/modelv2/"
   }
 }
