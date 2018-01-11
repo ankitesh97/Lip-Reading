@@ -90,7 +90,7 @@
   },
 
   "Training":{
-    "epochs":5,
+    "epochs":2,
     "batch_size":64,
     "is_training":0,
     "is_colored":0,
