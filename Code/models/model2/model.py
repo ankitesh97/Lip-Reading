@@ -42,9 +42,11 @@ class ImportGraph():
     def run(self, data):
         """ Running the activation function previously imported """
         # The 'x' corresponds to name of input placeholder
+        # print self.graph.get_tensor_by_name('cnn_forward/conv2d/bias:0').eval(session=self.sess)
+
         output = []
         for i in range(data.shape[0]):
-            output.append(self.sess.run(self.op, feed_dict={"Placeholder:0": data[0], "Placeholder_1:0":False}))
+            output.append(self.sess.run(self.op, feed_dict={"Placeholder:0": data[i], "Placeholder_1:0":False}))
         return np.array(output)
 
 def cnn_forward(input_array,sess2, op, input_te, is_train):
@@ -80,8 +82,12 @@ def dense_layer_op(input_te, is_train):
     dense_3_last =  tf.layers.dense(inputs=batch_norm_dense_2_last, units= dense_config['units_layer_3'], activation=mapActivationFunc(dense_config['activation']), kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
     batch_norm_dense_3_last = tf.contrib.layers.batch_norm(inputs=dense_3_last)
 
+
+    #dense layer 4
+    dense_4_last =  tf.layers.dense(inputs=batch_norm_dense_3_last, units= dense_config['units_layer_4'], activation=mapActivationFunc(dense_config['activation']), kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
+
     #output layer
-    features_last =  tf.layers.dense(inputs=batch_norm_dense_3_last, units= dense_config['feature_dim'], kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
+    features_last =  tf.layers.dense(inputs=dense_4_last, units= dense_config['feature_dim'], kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
 
     return features_last
 
@@ -111,7 +117,16 @@ def main():
     lstm_op_forward = LSTM(last_layers_output,config["LSTM"],is_training=is_train).forward
 
     nb_classes = training_params['nb_classes']
-    learning_rate = training_params['learning_rate']
+    learning_rate_init = tf.constant(training_params['learning_rate'], dtype=tf.float32)
+    learning_rate = tf.Variable(training_params['learning_rate'],trainable=False, dtype=tf.float32)
+
+    global_step = tf.Variable(0, trainable=False)
+    global_step_increment = tf.assign(global_step, global_step+1)
+    one = tf.constant(1,dtype=tf.float32)
+    decay_const = tf.constant(1,dtype=tf.float32)
+    # print one
+    decay_op = tf.multiply(learning_rate_init, tf.divide(one,tf.add(one,tf.multiply(decay_const,tf.to_float(global_step)))))
+    learning_rate_decay = tf.assign(learning_rate,decay_op)
 
     onehot_labels = tf.placeholder(tf.int32, [None, nb_classes], name="onehot")
     train_op, loss = train(onehot_labels, lstm_op_forward, learning_rate)
@@ -128,15 +143,13 @@ def main():
     # saver = tf.train.Saver(max_to_keep=4)
     init = tf.global_variables_initializer()
     Losses = []
-    model_save_add_local = './trained_models/modelv1/clstmModel_final'
+    model_save_add_local = './trained_models/cnn/clstmModel_final'
 
     cnn_model = ImportGraph(model_save_add_local)
 
     saver = tf.train.Saver(max_to_keep=4)
     with tf.Session() as sess:
         sess.run(init)
-        graph = tf.get_default_graph()
-
         print "---------------Starting to train-------------"
         sys.stdout.flush()
         writer = tf.summary.FileWriter('logs/model2', graph=tf.get_default_graph())
@@ -192,9 +205,11 @@ def main():
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"+" Count "+str(count)
             sys.stdout.flush()
     #
+            sess.run(global_step_increment)
+            sess.run(learning_rate_decay)
 
         saver.save(sess, model_save_add+"model_final")
-        print graph.get_tensor_by_name('rnn_forward/dense_1/bias:0').eval()
+        # print graph.get_tensor_by_name('rnn_forward/dense_1/bias:0').eval()
 
         open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
 
@@ -207,7 +222,7 @@ def test():
     new_saver = tf.train.import_meta_graph(model_save_add+'model_final.meta')
     graph = tf.get_default_graph()
 
-    model_save_add_local = './trained_models/modelv1/clstmModel_final'
+    model_save_add_local = './trained_models/cnn/clstmModel_final'
 
     cnn_model = ImportGraph(model_save_add_local)
 
