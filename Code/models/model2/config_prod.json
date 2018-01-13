@@ -91,12 +91,12 @@
 
   "Training":{
     "epochs":50,
-    "batch_size":64,
+    "batch_size":256,
     "is_training":0,
     "is_colored":0,
-    "nb_classes":9,
+    "nb_classes":2,
     "learning_rate":0.002,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv1/"
+    "save_file_address":"./trained_models/cnnv2/"
   }
 }
