@@ -33,6 +33,7 @@ def train(onehot_labels, predicted, learning_rate):
 
 def main():
     config = loadConfig('config_prod.json')
+
     training_params = config["Training"]
 
     #define cnn operation
@@ -72,6 +73,7 @@ def main():
         print "---------------Starting to train-------------"
         sys.stdout.flush()
         sess.run(init)
+
         writer = tf.summary.FileWriter('logs', graph=tf.get_default_graph())
         for e in range(epochs):
             total = loadDataQueue(is_colored)
