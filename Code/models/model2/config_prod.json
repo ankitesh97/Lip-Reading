@@ -65,7 +65,7 @@
   "LSTM":
   {
     "hidden_dim":256,
-    "vocab_size":9,
+    "vocab_size":500,
     "time_steps": 29,
     "Dense":
     {
@@ -91,13 +91,13 @@
   },
 
   "Training":{
-    "epochs":100,
-    "batch_size":64,
-    "is_training":0,
+    "epochs":20,
+    "batch_size":256,
+    "is_training":1,
     "is_colored":0,
-    "nb_classes":9,
-    "learning_rate":0.01,
-    "acc_size":256,
-    "save_file_address":"./trained_models/modelv6/"
+    "nb_classes":500,
+    "learning_rate":0.001,
+    "acc_size":5000,
+    "save_file_address":"./trained_models/modelv5/"
   }
 }
