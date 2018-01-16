@@ -143,11 +143,11 @@ def main():
     # saver = tf.train.Saver(max_to_keep=4)
     init = tf.global_variables_initializer()
     Losses = []
-    model_save_add_local = './trained_models/cnnv2/clstmModel_final'
+    model_save_add_local = './trained_models/cnn_model_lip_border/clstmModel_final'
 
     cnn_model = ImportGraph(model_save_add_local)
 
-    saver = tf.train.Saver(max_to_keep=4)
+    saver = tf.train.Saver(max_to_keep=8)
     with tf.Session() as sess:
         sess.run(init)
         print "---------------Starting to train-------------"
@@ -222,7 +222,7 @@ def test():
     new_saver = tf.train.import_meta_graph(model_save_add+'model_final.meta')
     graph = tf.get_default_graph()
 
-    model_save_add_local = './trained_models/cnnv2/clstmModel_final'
+    model_save_add_local = './trained_models/cnn_model_lip_border/clstmModel_final'
 
     cnn_model = ImportGraph(model_save_add_local)
 
