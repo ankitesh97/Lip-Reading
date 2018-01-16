@@ -39,6 +39,6 @@ def getNextBatch(batchSize,COLORFLAG=0):
     print finalDataReturn.shape
     return finalDataReturn
 
-total = loadDataQueue()
-
-a= getNextBatch(total)
+# total = loadDataQueue()
+#
+# a= getNextBatch(total)

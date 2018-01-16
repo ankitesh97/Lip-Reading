@@ -25,7 +25,7 @@ def define_scope(function):
     return decorator
 
 class LSTM:
-    def __init__(self,input_tesor, config, seq_len=None, is_training=True):
+    def __init__(self,input_tesor, config, seq_len, is_training=True):
         self.config = config
         self.input_tesor = input_tesor
         self.is_training = is_training
@@ -43,11 +43,9 @@ class LSTM:
             batch_size = tf.shape(output)[0]
             max_length = int(output.get_shape()[1])
             output_size = int(output.get_shape()[2])
-            index = tf.range(0, batch_size) * max_length + (self.seq_len - 1)
-            print output.shape
+            index = tf.add(tf.range(0, batch_size) * max_length , (self.seq_len - 1))
             flat = tf.reshape(output, [-1, output_size])
             last = tf.gather(flat, index)
-
         dense_config = self.config['Dense']
         logits = tf.layers.dense(inputs=last,units=dense_config['units_layer_1'],activation=mapActivationFunc(dense_config['activation']),
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),

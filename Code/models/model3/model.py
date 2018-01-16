@@ -11,6 +11,7 @@ load_src("loadData", "../../utils/loadData.py")
 import tensorflow as tf
 from CNN import CNN
 from LSTM import LSTM
+from Clustering import *
 from util import *
 from loadData import *
 import time
@@ -60,21 +61,30 @@ def get_viseme_class(Kmeansobj, data, seq_len):
     return output
 
 
+def train(onehot_labels, predicted, learning_rate):
+    loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=predicted)
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    minimize = optimizer.minimize(loss)
+    return minimize, loss
+
+
 def main():
     config = loadConfig('config_prod.json')
     training_params = config["Training"]
 
     time_steps = config['LSTM']['time_steps']
     input_shape = config["CNN"]["Input_shape"]
-    no_of_clusters = config['KMeans']["no_of_clusters"]
-    clustering_iterations = config['Kmeans']['clustering_iterations']
-    clustering_save_file_add = config['Kmeans']['clustering_save_file_add']
-    clustering_obj = KMEANS(no_of_clusters, clustering_iterations, address=clustering_save_file_add)
+    no_of_clusters = config['Clustering']["no_of_clusters"]
+    clustering_iterations = config['Clustering']['clustering_iterations']
+    clustering_save_file_add = config['Clustering']['clustering_save_file_add']
+    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
+    clustering_obj.loadFile()
+    batch_size = training_params['batch_size']
 
     #define graph
-    sequence = tf.placeholder(tf.float32, shape=[None,time_steps,no_of_clusters], name="Input_seq_clustering"))
+    sequence = tf.placeholder(tf.float32, shape=[None,time_steps,no_of_clusters], name="Input_seq_clustering")
     is_train = tf.placeholder(tf.bool, name="is_train_clustering")
-    seq_len = tf.placeholder(tf.int32, name="seq_len")
+    seq_len = tf.placeholder(tf.int32, name="seq_len", shape=[None])
     lstm_op_forward = LSTM(sequence,config["LSTM"], seq_len=seq_len, is_training=is_train).forward
 
     nb_classes = training_params['nb_classes']
@@ -99,7 +109,6 @@ def main():
 
     epochs = training_params['epochs']
     is_colored = training_params['is_colored']
-    batch_size = training_params['batch_size']
     acc_size = training_params['acc_size']
     # saver = tf.train.Saver(max_to_keep=4)
     init = tf.global_variables_initializer()
@@ -189,11 +198,11 @@ def test():
     cnn_model = ImportGraph(model_save_add_local)
     training_params = config["Training"]
 
-    no_of_clusters = config['KMeans']["no_of_clusters"]
-    clustering_iterations = config['Kmeans']['clustering_iterations']
-    clustering_save_file_add = config['Kmeans']['clustering_save_file_add']
-    clustering_obj = KMEANS(no_of_clusters, clustering_iterations, address=clustering_save_file_add)
-
+    no_of_clusters = config['Clustering']["no_of_clusters"]
+    clustering_iterations = config['Clustering']['clustering_iterations']
+    clustering_save_file_add = config['Clustering']['clustering_save_file_add']
+    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
+    clustering_obj.loadFile()
     with tf.Session() as sess:
 
 

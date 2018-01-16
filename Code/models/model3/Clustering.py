@@ -1,7 +1,15 @@
 from sklearn import cluster
 import numpy as np
 import pickle
-from loadLipFeatures import *
+#
+# def load_src(name, fpath):
+#     import os, imp
+#     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
+#
+# load_src("loadLipFeatures", "../../utils/loadLipFeatures.py")
+
+
+# from loadLipFeatures import *
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
