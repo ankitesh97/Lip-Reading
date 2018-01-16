@@ -11,8 +11,8 @@ word_to_index = {'ABOUT':0,'BANKS':1,'CONSERVATIVE':2,'DIFFERENCE':3,'ENERGY':4,
 totalTrainFileName = Queue()
 
 def loadDataQueue(COLORFLAG=0):
-    SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified/'
-    COLOR_SOURCE_DIRECTORY = '/home/dharin/Desktop/Lip-Reading/Data/modified-color/'
+    SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified-lip-border/'
+    COLOR_SOURCE_DIRECTORY = '/home/ankitesh/Lip-Reading/Data/modified-color/'
     DIRECTORY=''
     if COLORFLAG==0:
         DIRECTORY = SOURCE_DIRECTORY
