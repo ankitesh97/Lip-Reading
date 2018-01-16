@@ -20,9 +20,9 @@ def loadDataQueue(COLORFLAG=0):
         DIRECTORY = COLOR_SOURCE_DIRECTORY
     fileArray = []
     for word in os.listdir(DIRECTORY):
-        for fileName in os.listdir(DIRECTORY+word+'/train/'):
+        for fileName in os.listdir(DIRECTORY+word+'/val/'):
             if 'avi' in fileName:
-                fileArray.append(DIRECTORY+word+'/train/'+fileName)
+                fileArray.append(DIRECTORY+word+'/val/'+fileName)
     np.random.shuffle(fileArray)
     for x in fileArray:
         totalTrainFileName.put(x)
@@ -36,13 +36,16 @@ def emptyDataQueue():
 def getNextBatch(batchSize,COLORFLAG=0):
     finalDataReturn = []
     finalNameReturn=[]
+    frameReturn=[]
     if batchSize<=totalTrainFileName.qsize():
         forLoopRange = batchSize
     else:
         forLoopRange = totalTrainFileName.qsize()
     for x in range(forLoopRange):
         removedFromQueue = totalTrainFileName.get()
+        print removedFromQueue
         finalNameReturn.append(word_to_index[removedFromQueue.split('_')[0].split('/')[-1]])
+        frameReturn.append(int(removedFromQueue.split('_')[2].split('.')[0]))
         cap = cv2.VideoCapture(removedFromQueue)
         temp=[]
         for x in range(0,29):
@@ -58,4 +61,7 @@ def getNextBatch(batchSize,COLORFLAG=0):
         else:
             temp3 = temp
         finalDataReturn.append(temp3)
-    return np.array(np.swapaxes(finalDataReturn,0,1)),np.array(finalNameReturn)
+    return np.array(np.swapaxes(finalDataReturn,0,1)),np.array(finalNameReturn),np.array(frameReturn)
+# loadDataQueue()
+# a,b,c = getNextBatch(5)
+# print b,c
