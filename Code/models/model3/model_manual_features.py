@@ -25,27 +25,6 @@ train_flag = dynamic_config['Training']['is_training']
 model_save_add = dynamic_config["Training"]['save_file_address']
 
 
-
-class ImportGraph():
-    def __init__(self, loc):
-        self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
-        with self.graph.as_default():
-            saver = tf.train.import_meta_graph(loc + '.meta',
-                                               clear_devices=True)
-            saver.restore(self.sess, loc)
-            self.op = "cnn_forward/cnn_final_layer:0"
-
-    def run(self, data):
-
-        output = []
-        for i in range(data.shape[0]):
-            output.append(self.sess.run(self.op, feed_dict={"Placeholder:0": data[i], "Placeholder_1:0":False}))
-        #returns 29 X batch_size X dimension
-        return np.array(output)
-
-
-
 def get_viseme_class(Kmeansobj, data, seq_len):
     output = []
     #data of size time X batch x feature
@@ -68,23 +47,18 @@ def train(onehot_labels, predicted, learning_rate):
     return minimize, loss
 
 
+
 def main():
-    config = loadConfig('config_prod.json')
-    training_params = config["Training"]
 
-    time_steps = config['LSTM']['time_steps']
-    input_shape = config["CNN"]["Input_shape"]
-    no_of_clusters = config['Clustering']["no_of_clusters"]
-    clustering_iterations = config['Clustering']['clustering_iterations']
-    clustering_save_file_add = config['Clustering']['clustering_save_file_add']
-    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
-    clustering_obj.loadFile()
-    batch_size = training_params['batch_size']
+    max_time = 29
+    feature_dim = 24
+    clustering_obj = #dharin class of kmeans
 
-    #define graph
-    sequence = tf.placeholder(tf.float32, shape=[None,time_steps,no_of_clusters], name="Input_seq_clustering")
-    is_train = tf.placeholder(tf.bool, name="is_train_clustering")
+    sequence = tf.placeholder(dtype=tf.float32, shape=[None,max_time,no_of_clusters], name="sequence")
+    is_train = tf.placeholder(tf.bool, name="is_train")
     seq_len = tf.placeholder(tf.int32, name="seq_len", shape=[None])
+
+
     lstm_op_forward = LSTM(sequence,config["LSTM"], seq_len=seq_len, is_training=is_train).forward
 
     nb_classes = training_params['nb_classes']
@@ -105,20 +79,6 @@ def main():
     probabilities = tf.nn.softmax(lstm_op_forward, name="predict_classes")
     train_op, loss = train(onehot_labels, probabilities, learning_rate)
 
-    classes = tf.argmax(probabilities, axis=1)
-
-
-    epochs = training_params['epochs']
-    is_colored = training_params['is_colored']
-    acc_size = training_params['acc_size']
-    # saver = tf.train.Saver(max_to_keep=4)
-    init = tf.global_variables_initializer()
-    Losses = []
-    model_save_add_local = './trained_models/cnn_model_lip_border/clstmModel_final'
-    cnn_model = ImportGraph(model_save_add_local)
-    saver = tf.train.Saver(max_to_keep=8)
-    cnn_model = ImportGraph(model_save_add_local)
-
 
     with tf.Session() as sess:
         sess.run(init)
@@ -135,12 +95,10 @@ def main():
                        print "-----------------stopping the training process .........."
                        sys.stdout.flush()
                        break
-            batch_count = 0
-            for i in range(0, total, batch_size):
-                X,y,sequence_length = getNextBatch(batch_size, is_colored)
-                X = X/255.0
-                X = cnn_model.run(X) #will return features # time_stpes X batch X feature_dim
-                X = get_viseme_class(clustering_obj,X,sequence_length)
+
+            for i in range(0,total,batch_size):
+                X, y, sequence_length = getNextBatch(batch_size) #will return time x batch x feature (24)
+                X = get_viseme_class(clustering_obj,X,sequence_length) #returns batch x time x n_clsuters
                 y = y.reshape(-1)
                 one_hot_targets = np.eye(nb_classes)[y]
                 sess.run(train_op, feed_dict={sequence:X,onehot_labels:one_hot_targets, is_train:True, seq_len:sequence_length})
@@ -150,16 +108,12 @@ def main():
                     sys.stdout.flush()
             if(e%3==0):
                 saver.save(sess, model_save_add+'model', global_step=e,write_meta_graph=False)
-
-
             emptyDataQueue()
             loadDataQueue(is_colored)
 
-            #take data
-            X_acc,Y, sequence_length = getNextBatch(acc_size, is_colored)
-            X_acc = X_acc/255.0
-            X_acc = cnn_model.run(X_acc)
-            X_acc = get_viseme_class(clustering_obj, X_acc, sequence_length)
+            X_acc,Y, sequence_length = getNextBatch(acc_size)
+            X_acc = get_viseme_class(clustering_obj,X_acc,sequence_length) #returns batch x time x n_clsuters
+
             Y = Y.reshape(-1)
             one_hot_targets = np.eye(nb_classes)[Y]
 
@@ -183,8 +137,8 @@ def main():
 
         saver.save(sess, model_save_add+"model_final")
         # print graph.get_tensor_by_name('rnn_forward/dense_1/bias:0').eval()
-
         open("losses.txt", "w").write(json.dumps({"losses":map(float,Losses)}))
+
 
 
 
@@ -195,29 +149,25 @@ def test():
     new_saver = tf.train.import_meta_graph(model_save_add+'model_final.meta')
     graph = tf.get_default_graph()
 
-    model_save_add_local = './trained_models/cnn_model_lip_border/clstmModel_final'
 
-    cnn_model = ImportGraph(model_save_add_local)
     training_params = config["Training"]
 
     no_of_clusters = config['Clustering']["no_of_clusters"]
     clustering_iterations = config['Clustering']['clustering_iterations']
     clustering_save_file_add = config['Clustering']['clustering_save_file_add']
-    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
-    clustering_obj.loadFile()
+    # clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters) clustering code
+    # clustering_obj.loadFile()
     with tf.Session() as sess:
 
 
         new_saver.restore(sess, tf.train.latest_checkpoint(model_save_add))
-        sequence = graph.get_tensor_by_name('Input_seq_clustering:0')
-        is_train = graph.get_tensor_by_name('is_train_clustering:0')
+        sequence = graph.get_tensor_by_name('sequence:0')
+        is_train = graph.get_tensor_by_name('is_train:0')
         seq_len = graph.get_tensor_by_name('seq_len:0')
         onehot_labels = graph.get_tensor_by_name('onehot:0')
 
         total = loadDataQueue()
         X, y, sequence_length = getNextBatch(total)
-        X = X/255.0
-        X = cnn_model.run(X)
         X = get_viseme_class(clustering_obj,X,sequence_length)
         y2 = y.reshape(-1)
         one_hot_targets = np.eye(nb_classes)[y2]
