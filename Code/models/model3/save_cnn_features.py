@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadDataLip.py")
+load_src("loadData", "../../utils/loadData.py")
 
 import tensorflow as tf
 import os
@@ -27,25 +27,40 @@ class ImportGraph():
             saver.restore(self.sess, loc)
             # Get activation function from saved collection
             # You may need to change this in case you name it differently
-            self.op = "cnn_forward/cnn_final_layer:0"
+            self.op = "cnn_forward/dense_2/BiasAdd:0"
 
     def run(self, data):
-        return self.sess.run(self.op, feed_dict={"Placeholder:0": data, "Placeholder_1:0":False})
+        out = []
+        for i in range(data.shape[0]):
+            out.append(self.sess.run(self.op, feed_dict={"Placeholder:0": data[0], "Placeholder_1:0":False}))
 
+        return np.swapaxes(np.array(out),0,1)
 
 def main():
     config = loadConfig('config_prod.json')
     total = loadDataQueue()
+    print "====================="
     print total
-    batch_size = 1
+    print "====================="
+
+    batch_size = 256
     cnn = ImportGraph('./trained_models/cnn_model_lip_border/clstmModel_final')
-    for i in range(0,total, batch_size):
-        X,_ = getNextBatch(batch_size)
+    to = 0
+    for bat in range(0,total, batch_size):
+        X,_,seq_len = getNextBatch(batch_size)
         X = X/255.0
-        features = cnn.run(X)[0]
-        f = open("features/"+"feature_"+str(i)+".txt",'w')
-        f.write(json.dumps({"feature":map(float,features),"dim":len(features)}))
-        f.close()
+        features_out = cnn.run(X) #batchSize X time step X 512
+        # print features_out.shape
+        for i in range(X.shape[1]):
+            seq_len_curr = seq_len[i]
+            for j in range(seq_len_curr):
+                to = to + 1
+                f = open("features_lip_border_all_words/"+"feature_"+str(to)+".txt",'w')
+                f.write(json.dumps({"feature":map(float,features_out[i][j])}))
+                f.close()
+
+
+
 
 
 main()
