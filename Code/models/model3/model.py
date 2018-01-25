@@ -34,7 +34,7 @@ class ImportGraph():
             saver = tf.train.import_meta_graph(loc + '.meta',
                                                clear_devices=True)
             saver.restore(self.sess, loc)
-            self.op = "cnn_forward/cnn_final_layer:0"
+            self.op = "cnn_forward/dense_2/BiasAdd:0"
 
     def run(self, data):
 

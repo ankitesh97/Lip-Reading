@@ -108,7 +108,7 @@ class LSTM:
             print batch_size
             max_length = int(output.get_shape()[1])
             output_size = int(output.get_shape()[2])
-            index = tf.add(tf.range(0, batch_size) * max_length , (self.seq_len - 1))
+            index = tf.range(0, batch_size) * max_length + (self.seq_len - 1)
             flat = tf.reshape(output, [-1, output_size])
             last = tf.gather(flat, index)
         dense_config = self.config['Dense']
