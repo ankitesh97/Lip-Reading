@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadDataLip.py")
+    load_src("loadData", "../../utils/loadDataLip.py")
 
 import tensorflow as tf
 import os
@@ -38,7 +38,7 @@ def main():
     total = loadDataQueue()
     print total
     batch_size = 1
-    cnn = ImportGraph('./trained_models/cnn_model_lip_border/clstmModel_final')
+    cnn = ImportGraph('./trained_models/cnnv2/clstmModel_final')
     for i in range(0,total, batch_size):
         X,_ = getNextBatch(batch_size)
         X = X/255.0

@@ -34,7 +34,7 @@ class ImportGraph():
             saver = tf.train.import_meta_graph(loc + '.meta',
                                                clear_devices=True)
             saver.restore(self.sess, loc)
-            self.op = "cnn_forward/cnn_final_layer:0"
+            self.op = "cnn_forward/dense_2/BiasAdd:0"
 
     def run(self, data):
 
@@ -62,7 +62,7 @@ def get_viseme_class(Kmeansobj, data, seq_len):
 
 
 def train(onehot_labels, predicted, learning_rate):
-    loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=predicted)
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=onehot_labels, logits=predicted))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     minimize = optimizer.minimize(loss)
     return minimize, loss
@@ -100,10 +100,11 @@ def main():
     learning_rate_decay = tf.assign(learning_rate,decay_op)
 
     onehot_labels = tf.placeholder(tf.int32, [None, nb_classes], name="onehot")
-    train_op, loss = train(onehot_labels, lstm_op_forward, learning_rate)
 
     #prediction
     probabilities = tf.nn.softmax(lstm_op_forward, name="predict_classes")
+    train_op, loss = train(onehot_labels, probabilities, learning_rate)
+
     classes = tf.argmax(probabilities, axis=1)
 
 
@@ -189,6 +190,7 @@ def main():
 
 def test():
     c = loadConfig(CONFIG_FILE)
+    config = c
     nb_classes = c["Training"]["nb_classes"]
     new_saver = tf.train.import_meta_graph(model_save_add+'model_final.meta')
     graph = tf.get_default_graph()
@@ -220,7 +222,7 @@ def test():
         y2 = y.reshape(-1)
         one_hot_targets = np.eye(nb_classes)[y2]
 
-        preds =  sess.run('predict_hybrid:0',feed_dict={sequence:X, is_train:False, onehot_labels:one_hot_targets, seq_len:sequence_length})
+        preds =  sess.run('predict_classes:0',feed_dict={sequence:X, is_train:False, onehot_labels:one_hot_targets, seq_len:sequence_length})
         classes = tf.argmax(preds, axis=1)
         preds_classes = sess.run(classes)
         print len(preds_classes)
