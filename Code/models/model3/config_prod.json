@@ -79,9 +79,9 @@
   },
 
   "Clustering":{
-    "no_of_clusters":17,
-    "no_of_iteration":1000,
-    "clustering_save_file_add":"./trained_models/clustering/v1"
+    "no_of_clusters":20,
+    "clustering_iterations":1000,
+    "clustering_save_file_add":"./trained_models/clustering/kmeans-20.pkl"
   },
 
   "final_layer":{
@@ -99,11 +99,11 @@
   "Training":{
     "epochs":100,
     "batch_size":64,
-    "is_training":1,
+    "is_training":0,
     "is_colored":0,
     "nb_classes":9,
-    "learning_rate":0.001,
+    "learning_rate":0.01,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv6/"
+    "save_file_address":"./trained_models/modelv2/"
   }
 }
