@@ -64,24 +64,25 @@
 
   "LSTM":
   {
-    "hidden_dim":256,
+    "hidden_dim":1200,
     "vocab_size":9,
     "time_steps": 29,
     "Dense":
     {
       "activation": "relu",
-      "units_layer_1": 256,
-      "units_layer_2": 128,
+      "units_layer_1": 2048,
+      "units_layer_2": 1024,
       "dropout_1_rate": 0.20,
-      "dropout_2_rate": 0.6
-    }
+      "dropout_2_rate": 0.1
+    },
+    "batch_size":128
 
   },
 
   "Clustering":{
-    "no_of_clusters":17,
-    "no_of_iteration":1000,
-    "clustering_save_file_add":"./trained_models/clustering/v1"
+    "no_of_clusters":9,
+    "clustering_iterations":1000,
+    "clustering_save_file_add":"./trained_models/clustering/kmeans24featuresTrain9.pkl"
   },
 
   "final_layer":{
@@ -90,20 +91,20 @@
     "units_layer_2": 1024,
     "units_layer_3": 512,
     "units_layer_4":256,
-    "dropout_1_rate": 0.40,
-    "dropout_2_rate": 0.25,
-    "feature_dim": 256,
+    "dropout_1_rate": 0.20,
+    "dropout_2_rate": 0.20,
+    "feature_dim": 512,
     "acc_size":128
   },
 
   "Training":{
     "epochs":100,
-    "batch_size":64,
-    "is_training":1,
+    "batch_size":128,
+    "is_training":0,
     "is_colored":0,
     "nb_classes":9,
     "learning_rate":0.001,
     "acc_size":256,
-    "save_file_address":"./trained_models/modelv6/"
+    "save_file_address":"./trained_models/modelv20/"
   }
 }

@@ -65,7 +65,7 @@
   "LSTM":
   {
     "hidden_dim":256,
-    "vocab_size":500,
+    "vocab_size":9,
     "time_steps": 29,
     "Dense":
     {
@@ -73,15 +73,15 @@
       "units_layer_1": 256,
       "units_layer_2": 128,
       "dropout_1_rate": 0.20,
-      "dropout_2_rate": 0.6
+      "dropout_2_rate": 0.3
     }
 
   },
 
   "final_layer":{
     "activation": "relu",
-    "units_layer_1": 2048,
-    "units_layer_2": 1024,
+    "units_layer_1": 1024,
+    "units_layer_2": 512,
     "units_layer_3": 512,
     "units_layer_4":256,
     "dropout_1_rate": 0.40,
@@ -91,13 +91,13 @@
   },
 
   "Training":{
-    "epochs":20,
-    "batch_size":256,
-    "is_training":1,
+    "epochs":100,
+    "batch_size":128,
+    "is_training":0,
     "is_colored":0,
-    "nb_classes":500,
+    "nb_classes":9,
     "learning_rate":0.001,
-    "acc_size":5000,
-    "save_file_address":"./trained_models/modelv5/"
+    "acc_size":256,
+    "save_file_address":"./trained_models/modelv14/"
   }
 }

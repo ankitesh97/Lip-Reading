@@ -36,6 +36,10 @@ class KMEANS:
 
     def predict(self,data):
         predicted = self.kmeans.predict(data)
+        for i in data:
+            print i
+        print predicted
+        raw_input()
         y2 = predicted.reshape(-1)
         one_hot_targets = np.eye(self.noOfCluster)[y2]
         return one_hot_targets

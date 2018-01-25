@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadData.py")
+load_src("loadData", "../../utils/loadFeaturesBatch.py")
 
 
 import tensorflow as tf
@@ -25,9 +25,10 @@ train_flag = dynamic_config['Training']['is_training']
 model_save_add = dynamic_config["Training"]['save_file_address']
 
 
-def get_viseme_class(Kmeansobj, data, seq_len):
+def get_viseme_class(Kmeansobj, data, seq_len,y):
     output = []
     #data of size time X batch x feature
+    print y
     for i in range(data.shape[0]):
         output.append(Kmeansobj.predict(data[i]))
     #shape of output time X batch X n_clusters
@@ -41,6 +42,8 @@ def get_viseme_class(Kmeansobj, data, seq_len):
 
 
 def train(onehot_labels, predicted, learning_rate):
+    # epsilon = tf.constant(value=0.00001)
+
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=onehot_labels, logits=predicted))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     minimize = optimizer.minimize(loss)
@@ -52,7 +55,18 @@ def main():
 
     max_time = 29
     feature_dim = 24
-    clustering_obj = #dharin class of kmeans
+    config = loadConfig('config_prod.json')
+    training_params = config["Training"]
+
+    time_steps = config['LSTM']['time_steps']
+    input_shape = config["CNN"]["Input_shape"]
+    no_of_clusters = config['Clustering']["no_of_clusters"]
+    clustering_iterations = config['Clustering']['clustering_iterations']
+    clustering_save_file_add = config['Clustering']['clustering_save_file_add']
+    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
+    clustering_obj.loadFile()
+    batch_size = training_params['batch_size']
+
 
     sequence = tf.placeholder(dtype=tf.float32, shape=[None,max_time,no_of_clusters], name="sequence")
     is_train = tf.placeholder(tf.bool, name="is_train")
@@ -62,7 +76,7 @@ def main():
     lstm_op_forward = LSTM(sequence,config["LSTM"], seq_len=seq_len, is_training=is_train).forward
 
     nb_classes = training_params['nb_classes']
-
+    # learning_rate = training_params['learning_rate']
     learning_rate_init = tf.constant(training_params['learning_rate'], dtype=tf.float32)
     learning_rate = tf.Variable(training_params['learning_rate'],trainable=False, dtype=tf.float32)
 
@@ -77,8 +91,15 @@ def main():
 
     #prediction
     probabilities = tf.nn.softmax(lstm_op_forward, name="predict_classes")
-    train_op, loss = train(onehot_labels, probabilities, learning_rate)
+    train_op, loss = train(onehot_labels, lstm_op_forward, learning_rate)
+    classes = tf.argmax(probabilities, axis=1)
 
+    init = tf.global_variables_initializer()
+    Losses = []
+    saver = tf.train.Saver(max_to_keep=8)
+    epochs = training_params['epochs']
+    is_colored = training_params['is_colored']
+    acc_size = training_params['acc_size']
 
     with tf.Session() as sess:
         sess.run(init)
@@ -95,12 +116,15 @@ def main():
                        print "-----------------stopping the training process .........."
                        sys.stdout.flush()
                        break
-
+            batch_count = 0
             for i in range(0,total,batch_size):
                 X, y, sequence_length = getNextBatch(batch_size) #will return time x batch x feature (24)
-                X = get_viseme_class(clustering_obj,X,sequence_length) #returns batch x time x n_clsuters
+                X = get_viseme_class(clustering_obj,X,sequence_length,y) #returns batch x time x n_clsuters
+
                 y = y.reshape(-1)
                 one_hot_targets = np.eye(nb_classes)[y]
+                if len(np.argwhere(np.isnan(X))):
+                    print "mila"
                 sess.run(train_op, feed_dict={sequence:X,onehot_labels:one_hot_targets, is_train:True, seq_len:sequence_length})
                 batch_count = batch_count + 1
                 if(batch_count%2==0):
@@ -109,10 +133,10 @@ def main():
             if(e%3==0):
                 saver.save(sess, model_save_add+'model', global_step=e,write_meta_graph=False)
             emptyDataQueue()
-            loadDataQueue(is_colored)
+            loadDataQueue(is_val='val')
 
             X_acc,Y, sequence_length = getNextBatch(acc_size)
-            X_acc = get_viseme_class(clustering_obj,X_acc,sequence_length) #returns batch x time x n_clsuters
+            X_acc = get_viseme_class(clustering_obj,X_acc,sequence_length,Y) #returns batch x time x n_clsuters
 
             Y = Y.reshape(-1)
             one_hot_targets = np.eye(nb_classes)[Y]
@@ -132,8 +156,8 @@ def main():
             print "Epoch: "+str(e)+" Loss: "+str(loss_val)+" Train Accuracy: "+str(acc_train)+"%"+" Count "+str(count)
             sys.stdout.flush()
     #
-            sess.run(global_step_increment)
-            sess.run(learning_rate_decay)
+            # sess.run(global_step_increment)
+            # sess.run(learning_rate_decay)
 
         saver.save(sess, model_save_add+"model_final")
         # print graph.get_tensor_by_name('rnn_forward/dense_1/bias:0').eval()
@@ -152,11 +176,15 @@ def test():
 
     training_params = config["Training"]
 
+    time_steps = config['LSTM']['time_steps']
+    input_shape = config["CNN"]["Input_shape"]
     no_of_clusters = config['Clustering']["no_of_clusters"]
     clustering_iterations = config['Clustering']['clustering_iterations']
     clustering_save_file_add = config['Clustering']['clustering_save_file_add']
-    # clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters) clustering code
-    # clustering_obj.loadFile()
+    clustering_obj = KMEANS(clustering_save_file_add,no_of_clusters)
+    clustering_obj.loadFile()
+    batch_size = training_params['batch_size']
+
     with tf.Session() as sess:
 
 
@@ -166,9 +194,9 @@ def test():
         seq_len = graph.get_tensor_by_name('seq_len:0')
         onehot_labels = graph.get_tensor_by_name('onehot:0')
 
-        total = loadDataQueue()
+        total = loadDataQueue(is_val='val')
         X, y, sequence_length = getNextBatch(total)
-        X = get_viseme_class(clustering_obj,X,sequence_length)
+        X = get_viseme_class(clustering_obj,X,sequence_length,y)
         y2 = y.reshape(-1)
         one_hot_targets = np.eye(nb_classes)[y2]
 

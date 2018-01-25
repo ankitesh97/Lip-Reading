@@ -25,29 +25,36 @@ def define_scope(function):
     return decorator
 
 class LSTM:
-    def __init__(self,input_tesor, config, is_training=True):
+    def __init__(self,input_tesor, config,seq_len, is_training=True):
         self.config = config
         self.input_tesor = input_tesor
         self.is_training = is_training
+        self.seq_len = seq_len
         self.forward
 
     @define_scope
     def forward(self):
-        cell = tf.nn.rnn_cell.LSTMCell(self.config["hidden_dim"],state_is_tuple=True, initializer=tf.truncated_normal_initializer(stddev=0.02))
-        output,state = tf.nn.dynamic_rnn(cell,self.input_tesor,dtype=tf.float32)
-        output = tf.transpose(output, [1, 0, 2])
-        last = tf.gather(output, int(output.get_shape()[0]) - 1) #Gather takes two values param and indices. works like slicing
+        celllstm = tf.nn.rnn_cell.LSTMCell(self.config["hidden_dim"],state_is_tuple=True,activation=tf.nn.tanh, initializer=tf.contrib.layers.xavier_initializer())
+        cellgru = tf.nn.rnn_cell.GRUCell(self.config["hidden_dim"], activation=tf.nn.tanh, kernel_initializer=tf.contrib.layers.xavier_initializer())
+        cellBatchnormLstm = tf.contrib.rnn.LayerNormBasicLSTMCell(self.config["hidden_dim"])
+        output,_ = tf.nn.dynamic_rnn(celllstm,self.input_tesor, dtype=tf.float32)
+        batch_size = tf.shape(output)[0]
+        max_length = int(output.get_shape()[1])
+        output_size = int(output.get_shape()[2])
+        index = tf.add(tf.range(0, batch_size) * max_length , (self.seq_len - 1))
+        flat = tf.reshape(output, [-1, output_size])
+        last = tf.gather(flat, index)
         dense_config = self.config['Dense']
         logits = tf.layers.dense(inputs=last,units=dense_config['units_layer_1'],activation=mapActivationFunc(dense_config['activation']),
-        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-        bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
+        kernel_initializer=tf.contrib.layers.xavier_initializer(),
+        bias_initializer=tf.contrib.layers.xavier_initializer())
         dropout_1 = tf.layers.dropout(inputs=logits, rate=dense_config['dropout_1_rate'], training=self.is_training)
         batch_norm_dense_1 = tf.contrib.layers.batch_norm(inputs=dropout_1)
-        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= self.config['vocab_size'], activation=mapActivationFunc(dense_config['activation']),
-        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-        bias_initializer=tf.truncated_normal_initializer(stddev=0.01))
-        return dense_2
+        dense_2 =  tf.layers.dense(inputs=batch_norm_dense_1, units= self.config['vocab_size'], activation=None,
+        kernel_initializer=tf.contrib.layers.xavier_initializer(),
+        bias_initializer=tf.contrib.layers.xavier_initializer())
 
+        return dense_2
 #example for lstm class
 def main():
     config2 = {"INPUT_DIMENSION":100,
