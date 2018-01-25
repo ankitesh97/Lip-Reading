@@ -6,7 +6,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadDataLip.py")
+load_src("loadData", "./loadDataLip.py")
 
 import tensorflow as tf
 from CNN import CNN
@@ -25,7 +25,7 @@ def main():
     config = loadConfig(CONFIG_FILE)
     inp_shape = config['CNN']['Input_shape']
     learning_rate = config['Training']['learning_rate']
-    nb_classes = config['Training']['nb_classes']
+    nb_classes = 2
     input_te = tf.placeholder(tf.float32, shape=[None,]+inp_shape)
     is_train = tf.placeholder(tf.bool)
     cnn_object = CNN(input_te,config["CNN"], is_train)

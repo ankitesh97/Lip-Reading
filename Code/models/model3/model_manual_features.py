@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadFeaturesBatch.py")
+load_src("loadData", "./loadFeaturesBatch.py")
 
 
 import tensorflow as tf
@@ -133,7 +133,7 @@ def main():
             if(e%3==0):
                 saver.save(sess, model_save_add+'model', global_step=e,write_meta_graph=False)
             emptyDataQueue()
-            loadDataQueue(is_val='val')
+            loadDataQueue(data='val')
 
             X_acc,Y, sequence_length = getNextBatch(acc_size)
             X_acc = get_viseme_class(clustering_obj,X_acc,sequence_length,Y) #returns batch x time x n_clsuters
@@ -194,7 +194,7 @@ def test():
         seq_len = graph.get_tensor_by_name('seq_len:0')
         onehot_labels = graph.get_tensor_by_name('onehot:0')
 
-        total = loadDataQueue(is_val='val')
+        total = loadDataQueue(data='val')
         X, y, sequence_length = getNextBatch(total)
         X = get_viseme_class(clustering_obj,X,sequence_length,y)
         y2 = y.reshape(-1)

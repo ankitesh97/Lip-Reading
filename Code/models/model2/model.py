@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadData.py")
+load_src("loadData", "./loadData.py")
 
 
 import tensorflow as tf
@@ -61,7 +61,7 @@ def cnn_forward(input_array,sess2, op, input_te, is_train):
 
 def dense_layer_op(input_te, is_train):
 
-    config = loadConfig('config_prod.json')
+    config = loadConfig(CONFIG_FILE)
     dense_config = config["final_layer"]
     # with tf.variable_scope("final_layer_part"):
     dense_1_last =  tf.layers.dense(inputs=input_te, units= dense_config['units_layer_1'], activation=mapActivationFunc(dense_config['activation']),kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),bias_initializer=tf.truncated_normal_initializer(stddev=0.01))

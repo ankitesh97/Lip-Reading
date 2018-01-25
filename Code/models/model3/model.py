@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadData.py")
+load_src("loadData", "./loadData.py")
 
 
 import tensorflow as tf

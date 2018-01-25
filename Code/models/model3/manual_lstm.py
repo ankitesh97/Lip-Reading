@@ -5,7 +5,7 @@ def load_src(name, fpath):
     return imp.load_source(name, os.path.join(os.path.dirname(__file__), fpath))
 
 load_src("util", "../../utils/model1.py")
-load_src("loadData", "../../utils/loadFeaturesBatch.py")
+load_src("loadData", "./loadFeaturesBatch.py")
 
 
 import tensorflow as tf
@@ -155,7 +155,7 @@ def main():
                     sys.stdout.flush()
 
             emptyDataQueue()
-            total_val = loadDataQueue(is_val='val')
+            total_val = loadDataQueue(data='val')
 
             X_acc,Y, sequence_length = getNextBatch(total_val)
             # X_acc = np.swapaxes(X_acc, 0, 1)
@@ -236,7 +236,7 @@ def test():
         seq_len = graph.get_tensor_by_name('seq_len:0')
         onehot_labels = graph.get_tensor_by_name('onehot:0')
 
-        total = loadDataQueue(is_val='val')
+        total = loadDataQueue(data='val')
         X, y, sequence_length = getNextBatch(total)
         # X = np.swapaxes(X,0,1)
         y2 = y.reshape(-1)
