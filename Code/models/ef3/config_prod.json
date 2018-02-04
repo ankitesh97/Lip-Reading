@@ -1,0 +1,99 @@
+
+
+{
+  "CNN":
+  {
+    "Input_shape":[72,42,29],
+    "Conv-Box-1":
+    {
+        "filters": 96,
+        "kernel_size":[3,3],
+        "activation": "relu",
+        "pool_size": [3,3],
+        "strides":1
+    },
+
+    "Conv-Box-2":
+    {
+        "filters": 256,
+        "kernel_size":[3,3],
+        "activation": "relu",
+        "pool_size": [3,3],
+        "strides":1
+    },
+
+    "Conv-Box-3":
+    {
+        "filters": 512,
+        "kernel_size":[3,3],
+        "activation": "relu"
+    },
+
+    "Conv-Box-4":
+    {
+        "filters": 512,
+        "kernel_size":[3,3],
+        "activation": "relu"
+    },
+
+    "Conv-Box-5":
+    {
+        "filters": 512,
+        "kernel_size":[3,3],
+        "activation": "relu",
+        "pool_size": [3,3],
+        "strides":1
+    },
+
+    "Dense":
+    {
+      "activation": "relu",
+      "units_layer_1": 4096,
+      "units_layer_2": 4096,
+      "dropout_1_rate": 0.4,
+      "dropout_2_rate": 0.2,
+      "feature_dim": 9,
+      "acc_size":128
+  }
+
+  },
+
+  "LSTM":
+  {
+    "hidden_dim":256,
+    "vocab_size":9,
+    "time_steps": 29,
+    "Dense":
+    {
+      "activation": "relu",
+      "units_layer_1": 256,
+      "units_layer_2": 128,
+      "dropout_1_rate": 0.20,
+      "dropout_2_rate": 0.3
+    }
+
+  },
+
+  "final_layer":{
+    "activation": "relu",
+    "units_layer_1": 1024,
+    "units_layer_2": 512,
+    "units_layer_3": 512,
+    "units_layer_4":256,
+    "dropout_1_rate": 0.40,
+    "dropout_2_rate": 0.25,
+    "feature_dim": 256,
+    "acc_size":128
+  },
+
+  "Training":{
+    "epochs":100,
+    "batch_size":64,
+    "is_training":1,
+    "is_colored":0,
+    "nb_classes":9,
+    "learning_rate":0.001,
+    "acc_size":256,
+    "save_file_address":"./trained_models/modelv14/"
+  }
+}
